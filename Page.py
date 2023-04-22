@@ -1,8 +1,9 @@
 class Page:
-    def __init__(self, page_id, direction, flag):
+    def __init__(self, page_id, direction, flag,size):
         self.page_id = page_id
         self.direction = direction
         self.flag = flag
+        self.size = size
 
     # GETTERS
     def get_page_id(self):
@@ -14,9 +15,12 @@ class Page:
     def get_flag(self):
         return self.flag
 
+    def get_size(self):
+        return self.size
+
     # SETTERS
-    def set_page_id(self, id):
-        self.page_id = id
+    def set_page_id(self, page_id):
+        self.page_id = page_id
 
     def set_direction(self, direction):
         self.direction = direction
@@ -24,3 +28,6 @@ class Page:
     # TRUE -> MEMORIA REAL // FALSE -> MEMORIA VIRTUAL
     def set_flag(self, state):
         self.flag = state
+
+    def set_size(self, size):
+        self.size = size
