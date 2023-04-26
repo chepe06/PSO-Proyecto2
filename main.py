@@ -30,8 +30,10 @@ def openNewWindow():
     newWindow.title("Ejecuntando")
     
     global selected
+   
 
-    #Creacion del mainframe de ala ventana emergente
+    #Creacion del mainframe de a la ventana emergente 
+
     nwMainFrame = Frame(newWindow)
 
     nwMainFrame.pack(fill="both")
@@ -39,9 +41,11 @@ def openNewWindow():
     nwMainFrame.config(width="720",height="650")
     
     #Tabla del OPT
-    Label(nwMainFrame, text="MMU-OPT" ,justify="center").grid(row=0, column=0,pady=4)
+    Label(nwMainFrame, text="MMU-OPT" ,justify="center").grid(row=0, column=0)
+    
+    h = Scrollbar(nwMainFrame, orient='vertical')
 
-    tv = ttk.Treeview(nwMainFrame, columns=("col1","col2","col3","col4","col5","col6","col7"))
+    tv = ttk.Treeview(nwMainFrame,yscrollcommand=h.set, columns=("col1","col2","col3","col4","col5","col6","col7"))
     tv.column("#0",width=70)
     tv.column("col1",width=70,anchor=CENTER)
     tv.column("col2",width=70,anchor=CENTER)
@@ -59,31 +63,130 @@ def openNewWindow():
     tv.heading("col5",text="D-ADDR",anchor=CENTER)
     tv.heading("col6",text="LOADED-T",anchor=CENTER)
     tv.heading("col7",text="MARK",anchor=CENTER) 
-    tv.grid(row=1,column=0,pady=10)
+    tv.grid(row=1,column=0)
+
+    h.configure(command=tv.yview)
+    h.grid(row=1,column=1,rowspan=1,sticky=NS)
+ 
+
+    #Inferior
+    tvi1 = ttk.Treeview(nwMainFrame, columns=("col1"))
+    tvi1.column("#0",width=70)
+    tvi1.column("col1",width=70,anchor=CENTER)
+   
+    
+    tvi1.heading("#0",text="Processes", anchor=CENTER)
+    tvi1.heading("col1",text="Sim-Time",anchor=CENTER)
+   
+    tvi1.grid(row=2,column=0)
+
+
+    tvi2 = ttk.Treeview(nwMainFrame, columns=("col1","col2","col3"))
+    tvi2.column("#0",width=70)
+    tvi2.column("col1",width=70,anchor=CENTER)
+    tvi2.column("col2",width=70,anchor=CENTER)
+    tvi2.column("col3",width=70,anchor=CENTER)
+    
+    
+    tvi2.heading("#0",text="RAM KB", anchor=CENTER)
+    tvi2.heading("col1",text="RAM %",anchor=CENTER)
+    tvi2.heading("col2",text="V-RAM KB",anchor=CENTER)
+    tvi2.heading("col3",text="V-RAM %",anchor=CENTER)
+    
+    tvi2.grid(row=3,column=0)
+
+
+    tvi3 = ttk.Treeview(nwMainFrame, columns=("col1","col2","col3","col4"))
+    tvi3.column("#0",width=70)
+    tvi3.column("col1",width=70,anchor=CENTER)
+    tvi3.column("col2",width=70,anchor=CENTER)
+    tvi3.column("col3",width=70,anchor=CENTER)
+    tvi3.column("col4",width=70,anchor=CENTER)
+    
+    
+    tvi3.heading("#0",text="P-LOADED", anchor=CENTER)
+    tvi3.heading("col1",text="P-UNLOADED",anchor=CENTER)
+    tvi3.heading("col2",text="Trashing-s",anchor=CENTER)
+    tvi3.heading("col3",text="Trashing-%",anchor=CENTER)
+    tvi3.heading("col4",text="Fragmentación",anchor=CENTER)
+    
+    tvi3.grid(row=4,column=0)
+
+
+
+    #------------------------------------------------------------------------------
 
     #Tabla del algoritmo a comparar
-    Label(nwMainFrame, text="MMU-" + selected.get(),justify="center").grid(row=0, column=1,pady=4)
 
-    tv = ttk.Treeview(nwMainFrame, columns=("col1","col2","col3","col4","col5","col6","col7"))
-    tv.column("#0",width=70)
-    tv.column("col1",width=70,anchor=CENTER)
-    tv.column("col2",width=70,anchor=CENTER)
-    tv.column("col3",width=70,anchor=CENTER)
-    tv.column("col4",width=70,anchor=CENTER)
-    tv.column("col5",width=70,anchor=CENTER)
-    tv.column("col6",width=70,anchor=CENTER)
-    tv.column("col7",width=70,anchor=CENTER)
+    h2 = Scrollbar(nwMainFrame, orient='vertical')
+
+    Label(nwMainFrame, text="MMU-" + selected.get(),justify="center").grid(row=0, column=2)
+
+    tv1 = ttk.Treeview(nwMainFrame,yscrollcommand=h2.set, columns=("col1","col2","col3","col4","col5","col6","col7"))
+    tv1.column("#0",width=70)
+    tv1.column("col1",width=70,anchor=CENTER)
+    tv1.column("col2",width=70,anchor=CENTER)
+    tv1.column("col3",width=70,anchor=CENTER)
+    tv1.column("col4",width=70,anchor=CENTER)
+    tv1.column("col5",width=70,anchor=CENTER)
+    tv1.column("col6",width=70,anchor=CENTER)
+    tv1.column("col7",width=70,anchor=CENTER)
     
-    tv.heading("#0",text="PAGE ID", anchor=CENTER)
-    tv.heading("col1",text="PID",anchor=CENTER)
-    tv.heading("col2",text="LOADED",anchor=CENTER)
-    tv.heading("col3",text="L-ADDR",anchor=CENTER)
-    tv.heading("col4",text="M-ADDR",anchor=CENTER)
-    tv.heading("col5",text="D-ADDR",anchor=CENTER)
-    tv.heading("col6",text="LOADED-T",anchor=CENTER)
-    tv.heading("col7",text="MARK",anchor=CENTER) 
-    tv.grid(row=1,column=1,pady=10)
+    tv1.heading("#0",text="PAGE ID", anchor=CENTER)
+    tv1.heading("col1",text="PID",anchor=CENTER)
+    tv1.heading("col2",text="LOADED",anchor=CENTER)
+    tv1.heading("col3",text="L-ADDR",anchor=CENTER)
+    tv1.heading("col4",text="M-ADDR",anchor=CENTER)
+    tv1.heading("col5",text="D-ADDR",anchor=CENTER)
+    tv1.heading("col6",text="LOADED-T",anchor=CENTER)
+    tv1.heading("col7",text="MARK",anchor=CENTER) 
+    tv1.grid(row=1,column=2)
+   
+    h2.configure(command=tv1.yview)
+    h2.grid(row=1,column=3,rowspan=1,sticky=NS)
 
+     #Inferior
+    tv1i1 = ttk.Treeview(nwMainFrame, columns=("col1"))
+    tv1i1.column("#0",width=70)
+    tv1i1.column("col1",width=70,anchor=CENTER)
+   
+    
+    tv1i1.heading("#0",text="Processes", anchor=CENTER)
+    tv1i1.heading("col1",text="Sim-Time",anchor=CENTER)
+   
+    tv1i1.grid(row=2,column=2)
+
+
+    tv1i2 = ttk.Treeview(nwMainFrame, columns=("col1","col2","col3"))
+    tv1i2.column("#0",width=70)
+    tv1i2.column("col1",width=70,anchor=CENTER)
+    tv1i2.column("col2",width=70,anchor=CENTER)
+    tv1i2.column("col3",width=70,anchor=CENTER)
+    
+    
+    tv1i2.heading("#0",text="RAM KB", anchor=CENTER)
+    tv1i2.heading("col1",text="RAM %",anchor=CENTER)
+    tv1i2.heading("col2",text="V-RAM KB",anchor=CENTER)
+    tv1i2.heading("col3",text="V-RAM %",anchor=CENTER)
+    
+    tv1i2.grid(row=3,column=2)
+
+
+    tv1i3 = ttk.Treeview(nwMainFrame, columns=("col1","col2","col3","col4"))
+    tv1i3.column("#0",width=70)
+    tv1i3.column("col1",width=70,anchor=CENTER)
+    tv1i3.column("col2",width=70,anchor=CENTER)
+    tv1i3.column("col3",width=70,anchor=CENTER)
+    tv1i3.column("col4",width=70,anchor=CENTER)
+    
+    
+    tv1i3.heading("#0",text="P-LOADED", anchor=CENTER)
+    tv1i3.heading("col1",text="P-UNLOADED",anchor=CENTER)
+    tv1i3.heading("col2",text="Trashing-s",anchor=CENTER)
+    tv1i3.heading("col3",text="Trashing-%",anchor=CENTER)
+    tv1i3.heading("col4",text="Fragmentación",anchor=CENTER)
+    
+    tv1i3.grid(row=4,column=2)
 
 
 #Creacion del frame raiz
@@ -115,7 +218,7 @@ seedEntry = Entry(mainFrame)
 seedEntry.grid(row=1,column=1, padx=4,pady=4)
 seedEntry.config(justify="center")
 
-#Creacion del combobox
+#Creacion del combobox Algoritmo
 algotLabel = Label(mainFrame, text="Algoritmo")
 algotLabel.grid(row=2,column=0, padx=4,pady=4)
 
@@ -127,17 +230,41 @@ opmAlgo = OptionMenu(mainFrame, selected, *choices)
 opmAlgo.grid(row=2,column=1, padx=4,pady=4)
 opmAlgo.config(cursor="hand2")
 
+#Creacion del combobox N procesos
+pLabel = Label(mainFrame, text="Numero de procesos")
+pLabel.grid(row=3,column=0,pady=4)
+
+pchoices = ["10","50","100"]
+pselected = StringVar(mainFrame)
+pselected.set(pchoices[0])
+
+opmp = OptionMenu(mainFrame, pselected, *pchoices)
+opmp.grid(row=3,column=1,pady=4)
+opmp.config(cursor="hand2")
+
+#Creacion del combobox N operaciones
+opLabel = Label(mainFrame, text="Numero de operaciones")
+opLabel.grid(row=3,column=2,pady=4)
+
+opchoices = ["500","1000","5000"]
+opselected = StringVar(mainFrame)
+opselected.set(opchoices[0])
+
+opmAlgo = OptionMenu(mainFrame, opselected, *opchoices)
+opmAlgo.grid(row=3,column=3,pady=4)
+opmAlgo.config(cursor="hand2")
+
 #Input del archivo a cargar
 button_explore = Button(mainFrame,text = "Archivo",command = browseFiles)
-button_explore.grid(column = 0, row = 3,padx=4,pady=4)
+button_explore.grid(column = 0, row = 4,padx=4,pady=4)
 button_explore.config(cursor="hand2")
 
 label_file_explorer = Label(mainFrame, text = "File Explorer", width = 65, height = 4,fg = "blue")
-label_file_explorer.grid(column = 1, row = 3,padx=4)
+label_file_explorer.grid(column = 1, row = 4,padx=4)
 
 #Cracion del boton de ejecucion
 btnRun = Button(mainFrame,text="Correr", command =  openNewWindow )
-btnRun.grid(row=4,column=1)
+btnRun.grid(row=5,column=1)
 btnRun.config(cursor="hand2")
 
 root.mainloop()
