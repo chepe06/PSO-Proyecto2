@@ -113,9 +113,13 @@ class OPT:
                     data = instruction[1].split(",")
                     instruction[1] = data[0]
                     instruction.append(data[1][:-2])
-                else:
-                    instruction[1] = instruction[1][:-2]  # AGREGAR SALTO DE LINEA AL FINAL DEL DOCUMENTO
+                elif instruction[0] == "use" or instruction[0] == "delete" or instruction[0] == "kill":
+                    if instruction[1][-1] == "\n":
+                        instruction[1] = instruction[1][:-2]
+                    else:
+                        instruction[1] = instruction[1][:-1]
                 instructions.append(instruction)
+
         return instructions
 
     def process_commands(self):
