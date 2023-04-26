@@ -27,6 +27,9 @@ class OPT:
     def load_in_disk(self, ptr_id, size):
         self.ptrs_in_disk[ptr_id] = size
 
+    def unload_of_disk(self, ptr_id):
+        self.ptrs_in_disk.pop(ptr_id)
+
     def include_to_queue(self, ptr_id):
         temp = self.order_to_unload
         temp.append(ptr_id)
@@ -88,6 +91,19 @@ class OPT:
                 i = i + 1
                 needed_size = needed_size - size2
 
+    def delete_ptr(self, ptr_id):
+        if ptr_id in self.ptrs_loaded:
+            size = self.ptrs_loaded[ptr_id]
+            self.ptrs_loaded.pop(ptr_id)
+            self.increase_ram(size)
+        else:
+            self.ptrs_in_disk.pop(ptr_id)
+
+    def kill_pid(self, pid):
+        ptrs = self.pids[pid]
+        for ptr in ptrs:
+            self.delete_ptr(ptr)
+
     def open_document(self):
         instructions = []
         with open(self.document_name, "r") as file:
@@ -106,7 +122,7 @@ class OPT:
         ins = 0
         for instruction in self.instructions:
             if instruction[0] == "new":
-                pid = instruction[1]
+                pid = int(instruction[1])
                 size = int(instruction[2])
                 if self.RAM >= size:
                     self.decrease_ram(size)
@@ -132,12 +148,24 @@ class OPT:
                         instruction2 = self.instructions[ins].copy()
                         self.ptr_to_unload(instruction2, size)
                         self.decrease_ram(size)
+                        self.unload_of_disk(ptr_id)
                         self.load_in_ram2(ptr_id, size)
-        ins = ins + 1
+
+            elif instruction[0] == "delete":
+                ptr_id = int(instruction[1])
+                self.delete_ptr(ptr_id)
+
+            elif instruction[0] == "kill":
+                pid = int(instruction[1])
+                self.kill_pid(pid)
+
+            ins = ins + 1
+
         print("PIDS", self.pids)
         print("PTRS-LOADED", self.ptrs_loaded)
         print("RAM", self.RAM)
         print("ORDER TO UNLOAD", self.order_to_unload)
+        print("PTRS-DISK", self.ptrs_in_disk)
 
 
 x = OPT('Test.txt')
