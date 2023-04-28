@@ -4,16 +4,20 @@ from tkinter import filedialog
 
 #ttk import
 from tkinter import ttk
-  
+
+import random
+
 #Variables globales
 filename = ""
+fileSelected=False
 
 # Function for opening the
 # file explorer window
 def browseFiles():
     global filename
+    global fileSelected
     filename = filedialog.askopenfilename(initialdir = "/home/",title = "Select a File",filetypes = (("Text files","*.txt*"),("all files","*.*")))
-      
+    fileSelected=True
     # Cambio de la etiqueta Archivo
     label_file_explorer.configure(text="File Opened: "+filename)
 
@@ -24,8 +28,71 @@ def printSelectedOp():
     print(seedEntry.get())
     print(filename)
 
+
+def fileGenerator(seed, p, n):
+    random.seed(seed)
+    procesList = {}
+    comdList = []
+    killProcess = []
+    ptrCount = 1
+    lastOp = ""
+    comandList = ["new", "use", "delete", "kill"]
+    for i in range(random.randint(0, p)):
+        rndPID = random.randint(1, p)
+        procesList[rndPID] = ptrCount
+        comdList.append(comandList[0] + "(" + str(rndPID) + "," + str(random.randint(50, 1000)) + ")\n")
+        ptrCount += 1
+
+    lastOp = "new"
+
+    i = 1
+    while i <= n:
+        chs = random.choice(comandList)
+        if chs == "new":
+            rndPID = random.randint(1, p)
+            if lastOp != "kill" and rndPID not in killProcess:
+                procesList[rndPID] = ptrCount
+                comdList.append(comandList[0] + "(" + str(rndPID) + "," + str(random.randint(50, 1000)) + ")\n")
+                ptrCount += 1
+                lastOp = "new"
+                i += 1
+
+        if chs == "use" and len(procesList) != 0:
+            procesListAux = []
+            procesListAux.extend(procesList.values())
+            randPtr = random.choice(procesListAux)
+            comdList.append(comandList[1] + "(" + str(randPtr) + ")\n")
+            i += 1
+
+        if chs == "delete" and len(procesList) != 0:
+            procesListAux = []
+            procesListAux.extend(procesList.values())
+            randPtr = random.choice(procesListAux)
+            comdList.append(comandList[2] + "(" + str(randPtr) + ")\n")
+            procesList = {key: value for key, value in procesList.items() if value != randPtr}
+            i += 1
+
+        if chs == "kill" and len(procesList) != 0:
+            procesListAux = []
+            procesListAux.extend(procesList.keys())
+            randPID = random.choice(procesListAux)
+            comdList.append(comandList[3] + "(" + str(randPID) + ")\n")
+            procesList = {key: value for key, value in procesList.items() if key != randPID}
+            killProcess.append(randPID)
+            i += 1
+
+    print(procesList)
+    print(comdList)
+    # Open a file for writing
+    with open('generatedFile.txt', 'w') as f:
+        # Write some text to the file
+        for i in comdList:
+            f.write(i)
+
+
 #Creacion de la nueva ventana
 def openNewWindow():
+    fileGenerator(0, 20, 20)
     newWindow = Toplevel(root)
     newWindow.title("Ejecuntando")
     
