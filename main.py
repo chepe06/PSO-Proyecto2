@@ -40,7 +40,7 @@ def fileGenerator(seed, p, n):
     weights = [0.3, 0.6, 0.05, 0.05]
 
     i = 1
-    while i <= n:
+    while i <= n and len(killProcess) != p:
         chs = random.choices(comandList,weights)[0]
         if chs == "new":
             rndPID = random.randint(1, p)
