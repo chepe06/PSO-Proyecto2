@@ -11,6 +11,7 @@ import random
 filename = ""
 fileSelected=False
 
+
 # Function for opening the
 # file explorer window
 def browseFiles():
@@ -35,26 +36,18 @@ def fileGenerator(seed, p, n):
     comdList = []
     killProcess = []
     ptrCount = 1
-    lastOp = ""
     comandList = ["new", "use", "delete", "kill"]
-    for i in range(random.randint(0, p)):
-        rndPID = random.randint(1, p)
-        procesList[rndPID] = ptrCount
-        comdList.append(comandList[0] + "(" + str(rndPID) + "," + str(random.randint(50, 1000)) + ")\n")
-        ptrCount += 1
-
-    lastOp = "new"
+    weights = [0.3, 0.6, 0.05, 0.05]
 
     i = 1
     while i <= n:
-        chs = random.choice(comandList)
+        chs = random.choices(comandList,weights)[0]
         if chs == "new":
             rndPID = random.randint(1, p)
-            if lastOp != "kill" and rndPID not in killProcess:
+            if rndPID not in killProcess:
                 procesList[rndPID] = ptrCount
                 comdList.append(comandList[0] + "(" + str(rndPID) + "," + str(random.randint(50, 1000)) + ")\n")
                 ptrCount += 1
-                lastOp = "new"
                 i += 1
 
         if chs == "use" and len(procesList) != 0:
@@ -81,6 +74,9 @@ def fileGenerator(seed, p, n):
             killProcess.append(randPID)
             i += 1
 
+        print(chs)
+        print(i)
+
     print(procesList)
     print(comdList)
     # Open a file for writing
@@ -92,7 +88,8 @@ def fileGenerator(seed, p, n):
 
 #Creacion de la nueva ventana
 def openNewWindow():
-    fileGenerator(0, 20, 20)
+    fileGenerator(seedEntry.get(), int(pselected.get()), int(opselected.get()))
+    #fileGenerator(0,10,176)
     newWindow = Toplevel(root)
     newWindow.title("Ejecuntando")
     
