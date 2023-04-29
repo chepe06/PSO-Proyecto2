@@ -1,9 +1,13 @@
 class Page:
-    def __init__(self, page_id, direction, flag,size):
+    def __init__(self, page_id, direction, flag, size):
         self.page_id = page_id
         self.direction = direction
         self.flag = flag
         self.size = size
+
+    def __str__(self):
+        print("page_id- ")
+        return str(self.page_id)
 
     # GETTERS
     def get_page_id(self):

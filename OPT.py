@@ -2,14 +2,14 @@ import math
 
 
 class OPT:
-    def __init__(self, document_name):
+    def __init__(self, document_name, ram=1000, page_size=100):
         self.document_name = document_name
-        self.RAM = 1000  # 400000
-        self.page_size = 100  # 1000-1024?
+        self.RAM = ram
+        self.page_size = page_size
         self.ptr_id = 1
         self.page_id = 1
         self.pages_loaded = []  # (ptr, page_id)
-        self.pages_in_disk = []  # page_id
+        self.pages_in_disk = []  # (ptr, page_id)
         self.ptrs = {}  # key -> ptr_id ,  value ->  [page_id, ...]
         self.pids = {}  # key -> pid, value -> [ptr_id, ...]
         self.instructions = self.open_document()  # [[command, data], ...]
@@ -68,20 +68,21 @@ class OPT:
         instructions_use = [int(ins[1]) for ins in instructions
                             if ins[0] == "use" and int(ins[1]) in ptr_page_loaded and int(ins[1]) != ptr_id]
 
-        print("PTR  PAGE LOADED", ptr_page_loaded)
-        print("INSTRUCTION USE", instructions_use)
+        #print("PTR  PAGE LOADED", ptr_page_loaded)
+        #print("INSTRUCTION USE", instructions_use)
         ptrs_next_use = []
         unload_complete = False
 
         for ptr_id in ptr_page_loaded:
             if ptr_id not in instructions_use:  # En caso de que no se use
-                page_to_unload = [page for page in self.pages_loaded if page[0] == ptr_id][0]  # Se podría cambiar
-                print("page_to_unload",page_to_unload)
-                self.pages_loaded.remove(page_to_unload)  # Se baja la página de RAM
-                self.pages_in_disk.append(page_to_unload)  # Se sube la página en Disco
-                self.include_to_queue(page_to_unload)  # Se agrega a la cola de orden de bajar de RAM por el OTP
-                self.increase_ram(self.page_size)  # Se aumenta la RAM en 1 tamaño de página
-                unload_complete = True
+                pages_to_unload = [page for page in self.pages_loaded if page[0] == ptr_id]
+                for page in pages_to_unload:  # Se bajan todas las páginas que no se vuelven a utilizar
+                    #print("page_to_unload", page)
+                    self.pages_loaded.remove(page)  # Se baja la página de RAM
+                    self.pages_in_disk.append(page)  # Se sube la página en Disco
+                    self.include_to_queue(page)  # Se agrega a la cola de orden de bajar de RAM por el OTP
+                    self.increase_ram(self.page_size)  # Se aumenta la RAM en 1 tamaño de página
+                    unload_complete = True
                 break
             else:  # Si se vuelve a usar se guarda la posición del siguiente uso
                 index = instructions_use.index(ptr_id)
@@ -105,14 +106,13 @@ class OPT:
                 self.increase_ram(self.page_size)
             else:
                 self.pages_in_disk.remove(p)
-
         self.ptrs.pop(ptr_id)
 
     def kill_pid(self, pid):
         ptrs = self.pids[pid]
         for ptr in ptrs:
-            self.delete_ptr(ptr)
-
+            if ptr in self.ptrs:
+                self.delete_ptr(ptr)
         self.pids.pop(pid)
 
     def open_document(self):
@@ -143,7 +143,6 @@ class OPT:
     def process_commands(self):
         ins = 0
         for instruction in self.instructions:
-
             if instruction[0] == "new":
                 pid = int(instruction[1])
                 size = int(instruction[2])
@@ -178,11 +177,15 @@ class OPT:
 
                 for page in pages_in_ptr:
                     if not page in pages_loaded:
-                        instruction2 = self.instructions[ins:].copy()
-                        self.decrease_ram(self.page_size)
-                        self.page_to_unload(ptr_id, instruction2)
-                        self.load_in_ram(ptr_id, page)
-                        self.pages_in_disk.remove((ptr_id, page))
+                        if self.RAM >= self.page_size:
+                            self.decrease_ram(self.page_size)
+                            self.load_in_ram(ptr_id, page)
+                        else:
+                            instruction2 = self.instructions[ins:].copy()
+                            self.decrease_ram(self.page_size)
+                            self.page_to_unload(ptr_id, instruction2)
+                            self.load_in_ram(ptr_id, page)
+                            self.pages_in_disk.remove((ptr_id, page))
 
             elif instruction[0] == "delete":
                 ptr_id = int(instruction[1])
@@ -199,9 +202,13 @@ class OPT:
             print("RAM", x.RAM)
             print("PAGES LOADED", x.pages_loaded)
             print("PAGES IN DISK ", x.pages_in_disk)
-            print("ORDER TO UNLOAD", x.order_to_unload)
+            #print("ORDER TO UNLOAD", x.order_to_unload)
             print("\n")
 
+        return self.order_to_unload
 
+
+#x = OPT('generatedFile.txt')
 x = OPT('Test.txt')
-x.process_commands()
+print(x.process_commands())
+print(x.instructions)

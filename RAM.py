@@ -1,60 +1,47 @@
 class RAM:
 
-    def __init__(self):
-        self.setFreeRam(400)
-        self.setMemory(self.createEmptyRam())
-    
-    # seccion de los gets
-    
-    def getFreeRam(self):
-        return self.__maxSize
+    def __init__(self, ram=400, amount_pages=100, page_size=4):  # CAMBIAR
+        self.total_ram = ram
+        self.available_ram = ram
+        self.amount_pages = amount_pages
+        self.page_size = page_size  # ram // amount_pages
+        self.memory = self.create_empty_ram()
 
-    def getMemory(self):
-        return self.__memory
+    # GETTERS
+    def get_memory(self):
+        return self.memory
 
+    # FUNCTIONS
 
-    # seccion de los sets
-    def setFreeRam(self, maxSize):
-        self.__maxSize = maxSize
+    def create_empty_ram(self):
+        temp = []
+        for i in range(self.amount_pages):
+            temp.append(0)
+        return temp
 
-    def setMemory(self, memory):
-        self.__memory = memory
+    def is_full(self):
+        return self.available_ram == 0
 
+    def increase_ram(self):
+        self.available_ram = self.available_ram + self.page_size
 
-    #funciones
+    def decrease_ram(self):
+        self.available_ram = self.available_ram - self.page_size
 
+    def load_page(self, page):
+        self.decrease_ram()
+        temp = self.get_memory()
+        index = temp.index(0)
+        page[1].set_direction(index)  # Se agrega la ubicación dentro de la RAM
+        temp[index] = page
+        self.memory = temp
 
-#se crea una ram vacia de tamaño 100
-    def createEmptyRam(self):
-        tempList = []
-        for i in range(100):
-            tempList.append(0)
-        return tempList
-
-
-#se requiere saber si la RAM esta llena sabiendo el campo disponible de la RAM si es 0 o menor 
-    def isFull(self):
-        return self.getFreeRam() <= 0
-
-
-# se requiere asignar una pagina
-    def allocatePage(self, page):
-        tempFreeRam = self.getFreeRam()#se pregunta cuanto hay disponible
-        tempFreeRam -= 4 #seresta 4
-        self.setFreeRam(tempFreeRam)#se actualiza la memoria disponible
-        tempMem = self.getMemory()
-        index = tempMem.index(0)
-        tempMem.remove(0)
-        tempMem.insert(index, page)
-        self.setMemory(tempMem)
-
- #se requiere borrar una pagina    
-    def removePage(self, page):
-        tempFreeRam = self.getFreeRam()#se pregunta cuanto hay disponible
-        tempMem = self.getMemory()
-        tempFreeRam += 4 # se le suman 4
-        index = tempMem.index(page)#se capta la pagina
-        tempMem.remove(page)#se borra
-        tempMem.insert(index, 0)
-        self.setFreeRam(tempFreeRam)
-        self.setMemory(tempMem)
+    def unload_page(self, page):  # Page (ptr, page_id) mientras que en RAM (pid, Clase página)
+        self.increase_ram()
+        temp = self.memory
+        page_unloaded = [p for p in self.memory if page[1] == p[1].get_page_id()][0]
+        print(page_unloaded)
+        index = temp.index(page_unloaded)
+        temp[index] = 0
+        self.memory = temp
+        return page_unloaded
