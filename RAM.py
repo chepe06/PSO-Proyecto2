@@ -1,3 +1,6 @@
+from Page import Page
+
+
 class RAM:
 
     def __init__(self, ram=400, amount_pages=100, page_size=4):  # CAMBIAR
@@ -5,6 +8,7 @@ class RAM:
         self.available_ram = ram
         self.amount_pages = amount_pages
         self.page_size = page_size  # ram // amount_pages
+        self.free_page = Page(0, 0, 0, -1, True, 0)
         self.memory = self.create_empty_ram()
 
     # GETTERS
@@ -16,7 +20,7 @@ class RAM:
     def create_empty_ram(self):
         temp = []
         for i in range(self.amount_pages):
-            temp.append(0)
+            temp.append(self.free_page)
         return temp
 
     def is_full(self):
@@ -31,17 +35,17 @@ class RAM:
     def load_page(self, page):
         self.decrease_ram()
         temp = self.get_memory()
-        index = temp.index(0)
-        page[1].set_direction(index)  # Se agrega la ubicación dentro de la RAM
+        index = temp.index(self.free_page)
+        page.set_direction(index)  # Se agrega la ubicación dentro de la RAM
         temp[index] = page
         self.memory = temp
+        return page
 
-    def unload_page(self, page):  # Page (ptr, page_id) mientras que en RAM (pid, Clase página)
+    def unload_page(self, page_id):
         self.increase_ram()
         temp = self.memory
-        page_unloaded = [p for p in self.memory if page[1] == p[1].get_page_id()][0]
-        print(page_unloaded)
+        page_unloaded = [p for p in self.memory if page_id == p.get_page_id()][0]
         index = temp.index(page_unloaded)
-        temp[index] = 0
+        temp[index] = self.free_page
         self.memory = temp
         return page_unloaded

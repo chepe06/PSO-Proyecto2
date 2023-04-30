@@ -76,13 +76,15 @@ class OPT:
         for ptr_id in ptr_page_loaded:
             if ptr_id not in instructions_use:  # En caso de que no se use
                 pages_to_unload = [page for page in self.pages_loaded if page[0] == ptr_id]
+                order_to_unload = []
                 for page in pages_to_unload:  # Se bajan todas las páginas que no se vuelven a utilizar
                     #print("page_to_unload", page)
                     self.pages_loaded.remove(page)  # Se baja la página de RAM
                     self.pages_in_disk.append(page)  # Se sube la página en Disco
-                    self.include_to_queue(page)  # Se agrega a la cola de orden de bajar de RAM por el OTP
+                    order_to_unload.append(page) # Se hace una lista de las páginas a bajar en un solo paging
                     self.increase_ram(self.page_size)  # Se aumenta la RAM en 1 tamaño de página
-                    unload_complete = True
+                unload_complete = True
+                self.include_to_queue(order_to_unload)
                 break
             else:  # Si se vuelve a usar se guarda la posición del siguiente uso
                 index = instructions_use.index(ptr_id)
@@ -166,7 +168,7 @@ class OPT:
 
                     page_id = pages[i]
                     self.load_in_ram(self.ptr_id, page_id)
-                    self.relate_ptr_to_pages(page_id)
+                    self.relate_ptr_to_pages(page_id)  # Se relaciona el ptr con el page_id
 
                 self.increment_ptr_id()
 
@@ -180,6 +182,7 @@ class OPT:
                         if self.RAM >= self.page_size:
                             self.decrease_ram(self.page_size)
                             self.load_in_ram(ptr_id, page)
+                            self.pages_in_disk.remove((ptr_id, page)) # REVISAR
                         else:
                             instruction2 = self.instructions[ins:].copy()
                             self.decrease_ram(self.page_size)
@@ -202,7 +205,7 @@ class OPT:
             print("RAM", x.RAM)
             print("PAGES LOADED", x.pages_loaded)
             print("PAGES IN DISK ", x.pages_in_disk)
-            #print("ORDER TO UNLOAD", x.order_to_unload)
+            print("ORDER TO UNLOAD", x.order_to_unload)
             print("\n")
 
         return self.order_to_unload

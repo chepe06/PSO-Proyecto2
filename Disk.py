@@ -18,7 +18,7 @@ class Disk:
         self.increase_disk_use()
         temp = self.memory
         index = len(temp)
-        page[1].set_direction(index)  # Se guarda la dirección en Disco
+        page.set_direction(index)  # Se guarda la dirección en Disco
         temp.append(page)
         self.memory = temp
 
@@ -27,3 +27,4 @@ class Disk:
         temp = self.memory
         temp.remove(page)
         self.memory = temp
+        return page

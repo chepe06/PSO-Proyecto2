@@ -11,7 +11,10 @@ class MMU:
         self.page_id = 1
 
         # MAPA DE MEMORIA
-        self.table = {}
+        self.memory_table = {}  # KEY -> PAGE_ID - VALUE -> PAGE()
+        self.ptrs = {}          # KEY -> PTR_ID ,  VALUE ->  [PAGE_ID, ...]
+        self.pids = {}          # KEY -> PID - VALUE -> [PTR_ID, ...]
+
         self.pages_loaded = 0
         self.pages_unloaded = 0
 
@@ -42,25 +45,45 @@ class MMU:
     def decrement_pages_unloaded(self):
         self.pages_unloaded = self.pages_unloaded - 1
 
-    def create_page(self, size):
-        return Page(self.page_id, -1, True, size)
+    def relate_ptr_to_pages(self, page_id):
+        if self.ptr_id in self.ptrs:
+            temp = self.ptrs[self.ptr_id]
+            temp.append(page_id)
+            self.ptrs[self.ptr_id] = temp
+        else:
+            self.ptrs[self.ptr_id] = [page_id]
 
-    def get_table(self):
-        return self.table
+    def relate_pid_to_ptrs(self, pid):
+        if pid in self.pids:
+            temp = self.pids[pid]
+            temp.append(self.ptr_id)
+            self.pids[pid] = temp
+        else:
+            self.pids[pid] = [self.ptr_id]
 
-    def update_table(self, key, value):  # KEY -> PID - VALUE -> {} // KEY -> PTR - VALUE -> [ PAGE ID, ]
-        #
-        temp = self.table
+    def create_page(self, pid, size):
+        return Page(pid, self.ptr_id, self.page_id, -1, True, size)
+
+    def get_table_mem(self):
+        return self.memory_table
+
+    def add_page_to_memory_table(self, key, value):  # KEY -> PID - VALUE -> {} // KEY -> PTR - VALUE -> [ PAGE ID, ]
+        temp = self.memory_table
         temp[key] = value
-        self.table = temp
+        self.memory_table = temp
+
+    def delete_from_memory_table(self, page_id):
+        temp = self.memory_table
+        temp.pop(page_id)
+        self.memory_table = temp
 
     def new(self, pid, size):
         pass
 
-    def use(self, ptr):
+    def use(self, ptr_id):
         pass
 
-    def delete(self, ptr):
+    def delete(self, ptr_id):
         pass
 
     def kill(self, pid):
