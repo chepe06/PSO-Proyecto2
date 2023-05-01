@@ -12,11 +12,8 @@ class MMU:
 
         # MAPA DE MEMORIA
         self.memory_table = {}  # KEY -> PAGE_ID - VALUE -> PAGE()
-        self.ptrs = {}          # KEY -> PTR_ID ,  VALUE ->  [PAGE_ID, ...]
-        self.pids = {}          # KEY -> PID - VALUE -> [PTR_ID, ...]
-
-        self.pages_loaded = 0
-        self.pages_unloaded = 0
+        self.ptrs = {}          # KEY -> PTR_ID  - VALUE -> [PAGE_ID, ...]
+        self.pids = {}          # KEY -> PID     - VALUE -> [PTR_ID , ...]
 
         self.simulation_time = 0
         self.thrashing = 0
@@ -33,17 +30,12 @@ class MMU:
     def decrement_fragmentation(self, size):
         self.fragmentation = self.fragmentation - size
 
-    def increment_pages_loaded(self):
-        self.pages_loaded = self.pages_loaded + 1
+    def increment_simulation_time(self):
+        self.simulation_time = self.simulation_time + 1
 
-    def decrement_pages_loaded(self):
-        self.pages_loaded = self.pages_loaded - 1
-
-    def increment_pages_unloaded(self):
-        self.pages_unloaded = self.pages_unloaded + 1
-
-    def decrement_pages_unloaded(self):
-        self.pages_unloaded = self.pages_unloaded - 1
+    def increment_sim_thras_time(self):
+        self.simulation_time = self.simulation_time + 5
+        self.thrashing = self.thrashing + 5
 
     def relate_ptr_to_pages(self, page_id):
         if self.ptr_id in self.ptrs:

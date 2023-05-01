@@ -1,30 +1,25 @@
 import math
+import random
 from MMU import MMU
 from RAM import RAM
 from Disk import Disk
 
 
-class MMU_OPT(MMU):
-    def __init__(self, instructions, ram, disk, order_to_unload):
+class MMU_RND(MMU):
+    def __init__(self, instructions, ram, disk, seed):
         super().__init__(instructions, ram, disk)
-        self.order_to_unload = order_to_unload
+        self.seed = seed
 
     def unload_page(self):
-        page_to_unload = self.order_to_unload.pop(0)  # Página o Páginas por unload
-        if isinstance(page_to_unload, list):
-            for p in page_to_unload:
-                page_id = p[1]
-                real_page = self.RAM.unload_page(page_id)
-                real_page.set_flag(False)
-                self.add_page_to_memory_table(real_page.page_id,
-                                              real_page)  # Se actualiza de la tabla de memoria
-                self.disk.load_page(real_page)
-        else:
-            real_page = self.RAM.unload_page(page_to_unload[1])
-            real_page.set_flag(False)
-            self.add_page_to_memory_table(real_page.page_id,
-                                          real_page)  # Se actualiza de la tabla de memoria
-            self.disk.load_page(real_page)
+        random.seed(self.seed)
+        index = random.randint(0, self.RAM.amount_pages)
+        page_to_unload = self.RAM.memory[index]
+
+        real_page = self.RAM.unload_page(page_to_unload.get_page_id())
+        real_page.set_flag(False)
+        self.add_page_to_memory_table(real_page.page_id,
+                                      real_page)  # Se actualiza de la tabla de memoria
+        self.disk.load_page(real_page)
 
     def new(self, pid, size):
         page_size = self.RAM.page_size
@@ -160,5 +155,6 @@ AMOUNT_PAGES = 10
 PAGE_SIZE = 100
 ram1 = RAM(TOTAL_RAM, AMOUNT_PAGES, PAGE_SIZE)
 disk1 = Disk(PAGE_SIZE)
-x = MMU_OPT(instructions1, ram1, disk1, order_to_unload1)
+SEED = 1
+x = MMU_RND(instructions1, ram1, disk1, SEED)
 print(x.simulate())

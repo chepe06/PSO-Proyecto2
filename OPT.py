@@ -200,6 +200,7 @@ class OPT:
 
             ins = ins + 1
 
+            print("INSTRUCTION", instruction)
             print("PID -> PTRS", x.pids)
             print("PTR -> PAGES", x.ptrs)
             print("RAM", x.RAM)
