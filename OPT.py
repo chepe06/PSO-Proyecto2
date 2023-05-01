@@ -199,7 +199,7 @@ class OPT:
                 self.kill_pid(pid)
 
             ins = ins + 1
-
+            """
             print("INSTRUCTION", instruction)
             print("PID -> PTRS", x.pids)
             print("PTR -> PAGES", x.ptrs)
@@ -208,6 +208,7 @@ class OPT:
             print("PAGES IN DISK ", x.pages_in_disk)
             print("ORDER TO UNLOAD", x.order_to_unload)
             print("\n")
+            """
 
         return self.order_to_unload
 
