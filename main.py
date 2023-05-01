@@ -1,3 +1,5 @@
+import random
+
 from tkinter import *
 # import filedialog module
 from tkinter import filedialog
@@ -5,11 +7,42 @@ from tkinter import filedialog
 #ttk import
 from tkinter import ttk
 
-import random
+from OPT import OPT
+from RAM import RAM
+from Disk import Disk
+from MMU_OPT import MMU_OPT
+from MMU_RND import MMU_RND
 
 #Variables globales
 filename = ""
-fileSelected=False
+fileSelected = False
+
+# COMPUTER
+TOTAL_RAM = 1000
+AMOUNT_PAGES = 10
+PAGE_SIZE = 100
+
+
+def open_document(filename):
+    instructions = []
+    with open(filename, "r") as file:
+        for line in file:
+            instruction = line.split("(")
+            if instruction[0] == "new":
+                data = instruction[1].split(",")
+                instruction[1] = data[0]
+                if data[1][-1] == "\n":
+                    instruction.append(data[1][:-2])
+                else:
+                    instruction.append(data[1][:-1])
+            elif instruction[0] == "use" or instruction[0] == "delete" or instruction[0] == "kill":
+                if instruction[1][-1] == "\n":
+                    instruction[1] = instruction[1][:-2]
+                else:
+                    instruction[1] = instruction[1][:-1]
+            instructions.append(instruction)
+
+    return instructions
 
 
 # Function for opening the
@@ -74,11 +107,11 @@ def fileGenerator(seed, p, n):
             killProcess.append(randPID)
             i += 1
 
-        print(chs)
-        print(i)
+        #print(chs)
+        #print(i)
 
-    print(procesList)
-    print(comdList)
+    #print(procesList)
+    #print(comdList)
     # Open a file for writing
     with open('generatedFile.txt', 'w') as f:
         # Write some text to the file
@@ -88,13 +121,23 @@ def fileGenerator(seed, p, n):
 
 #Creacion de la nueva ventana
 def openNewWindow():
+    global selected, instructions, MMU_OPT, MMU_RND
+
     fileGenerator(seedEntry.get(), int(pselected.get()), int(opselected.get()))
     #fileGenerator(0,10,176)
     newWindow = Toplevel(root)
     newWindow.title("Ejecuntando")
     
-    global selected
-   
+    # VERIFICAR
+
+    """
+    for instruction in instructions:
+        MMU_OPT.simulate(instruction)
+        #print(MMU_OPT.RAM.available_ram)
+        MMU_RND.simulate(instruction)
+        #print(MMU_RND.RAM.available_ram)
+        #OBTENER DATOS Y GRAFICAR
+    """
 
     #Creacion del mainframe de a la ventana emergente 
 
@@ -327,6 +370,27 @@ label_file_explorer = Label(mainFrame, text = "File Explorer", width = 65, heigh
 label_file_explorer.grid(column = 1, row = 4,padx=4)
 
 #Cracion del boton de ejecucion
+
+"""
+## VERIFICAR
+
+filename_test = "generatedFile.txt"  # CAMBIAR
+seed = 1  # CAMBIAR
+
+instructions = open_document(filename_test)
+OPT = OPT(instructions, TOTAL_RAM, PAGE_SIZE)
+order_to_unload = OPT.process_commands()
+RAM1 = RAM(TOTAL_RAM, AMOUNT_PAGES, PAGE_SIZE)
+RAM2 = RAM(TOTAL_RAM, AMOUNT_PAGES, PAGE_SIZE)
+DISK1 = Disk(PAGE_SIZE)
+DISK2 = Disk(PAGE_SIZE)
+MMU_OPT = MMU_OPT(RAM1, DISK1, order_to_unload)
+
+#  SE DEBE VALIDAR SEGUN ALGORITMO SELECCIONADO
+MMU_RND = MMU_RND(RAM2, DISK2, seed)
+"""
+
+
 btnRun = Button(mainFrame,text="Correr", command =  openNewWindow )
 btnRun.grid(row=5,column=1)
 btnRun.config(cursor="hand2")

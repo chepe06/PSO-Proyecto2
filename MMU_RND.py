@@ -6,8 +6,8 @@ from Disk import Disk
 
 
 class MMU_RND(MMU):
-    def __init__(self, instructions, ram, disk, seed):
-        super().__init__(instructions, ram, disk)
+    def __init__(self, ram, disk, seed):
+        super().__init__(ram, disk)
         self.seed = seed
 
     def unload_page(self):
@@ -114,41 +114,8 @@ class MMU_RND(MMU):
                 self.delete(ptr_id)
         self.pids.pop(pid)
 
-    def simulate(self):
-        for instruction in self.instructions:
-            self.increment_simulation_time()
-            if instruction[0] == "new":
-                pid = int(instruction[1])
-                size = int(instruction[2])
-                self.new(pid, size)
 
-            elif instruction[0] == "use":
-                ptr_id = int(instruction[1])
-                self.use(ptr_id)
-
-            elif instruction[0] == "delete":
-                ptr_id = int(instruction[1])
-                self.delete(ptr_id)
-
-            elif instruction[0] == "kill":
-                pid = int(instruction[1])
-                self.kill(pid)
-
-        # print("RAM\n")
-        # print(self.RAM.available_ram)
-        # [print(p) for p in self.RAM.memory]
-        # print("DISK\n")
-        # [print(p) for p in self.disk.memory]
-        print("MEM TABLE\n")
-        [print(p, " - ", self.memory_table[p]) for p in self.memory_table]
-        print("FRAGMENTATION")
-        print(self.fragmentation)
-        print("SIMULATION TIME")
-        print(self.simulation_time)
-        print("THRASHING")
-        print(self.thrashing)
-
-
+"""
 instructions1 = [['new', '8', '493'], ['use', '1'], ['delete', '1'], ['new', '15', '874'], ['kill', '15'],
                  ['new', '37', '239'], ['use', '3'], ['use', '3'], ['use', '3'], ['use', '3'], ['new', '6', '112'],
                  ['use', '3'], ['use', '3'], ['new', '7', '961'], ['new', '38', '800'], ['use', '4'], ['use', '5'],
@@ -724,4 +691,4 @@ ram1 = RAM(TOTAL_RAM, AMOUNT_PAGES, PAGE_SIZE)
 disk1 = Disk(PAGE_SIZE)
 SEED = 1
 x = MMU_RND(instructions1, ram1, disk1, SEED)
-print(x.simulate())
+"""

@@ -2,8 +2,7 @@ import math
 
 
 class OPT:
-    def __init__(self, document_name, ram=1000, page_size=100):
-        self.document_name = document_name
+    def __init__(self, instructions, ram=1000, page_size=100):
         self.RAM = ram
         self.page_size = page_size
         self.ptr_id = 1
@@ -12,7 +11,7 @@ class OPT:
         self.pages_in_disk = []  # (ptr, page_id)
         self.ptrs = {}  # key -> ptr_id ,  value ->  [page_id, ...]
         self.pids = {}  # key -> pid, value -> [ptr_id, ...]
-        self.instructions = self.open_document()  # [[command, data], ...]
+        self.instructions = instructions  # [[command, data], ...]
         self.order_to_unload = []
 
     def increment_ptr_id(self):
@@ -116,24 +115,6 @@ class OPT:
             if ptr in self.ptrs:
                 self.delete_ptr(ptr)
         self.pids.pop(pid)
-
-    def open_document(self):
-        instructions = []
-        with open(self.document_name, "r") as file:
-            for line in file:
-                instruction = line.split("(")
-                if instruction[0] == "new":
-                    data = instruction[1].split(",")
-                    instruction[1] = data[0]
-                    instruction.append(data[1][:-2])  # Agregar el enter al final
-                elif instruction[0] == "use" or instruction[0] == "delete" or instruction[0] == "kill":
-                    if instruction[1][-1] == "\n":  # Cambiar
-                        instruction[1] = instruction[1][:-2]
-                    else:
-                        instruction[1] = instruction[1][:-1]
-                instructions.append(instruction)
-
-        return instructions
 
     def create_pages(self, pages_amount):
         pages = []
