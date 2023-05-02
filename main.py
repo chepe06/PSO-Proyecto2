@@ -13,6 +13,10 @@ from Disk import Disk
 from MMU_OPT import MMU_OPT
 from MMU_RND import MMU_RND
 
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+
+
 #Variables globales
 filename = ""
 fileSelected = False
@@ -146,13 +150,34 @@ def openNewWindow():
     nwMainFrame.pack(fill="both")
 
     nwMainFrame.config(width="720",height="650")
-    
+
+    #Ram del OTP
+    Label(nwMainFrame, text="RAM-OTP", justify="center").grid(row=0, column=0)
+    # Create a Figure object
+    fig = Figure(figsize=(5, 1), dpi=100)
+
+    # Create a table
+    table_data = [[]]
+    for i in range(100):
+        table_data[0].append(" ")
+    table = fig.add_subplot(111)
+    table.axis('off')  # Hide the axes
+    table.axis('tight')
+    table.table(cellText=table_data, loc='center')
+
+    # Create a Tkinter canvas that can display the figure
+    canvas = FigureCanvasTkAgg(fig, master=nwMainFrame)
+    canvas.draw()
+
+    # Pack the canvas into the tkinter window
+    canvas.get_tk_widget().grid(row=1,column=0,columnspan=1)
+
     #Tabla del OPT
-    Label(nwMainFrame, text="MMU-OPT" ,justify="center").grid(row=0, column=0)
+    Label(nwMainFrame, text="MMU-OPT" ,justify="center").grid(row=2, column=0)
     
     h = Scrollbar(nwMainFrame, orient='vertical')
 
-    tv = ttk.Treeview(nwMainFrame,yscrollcommand=h.set, columns=("col1","col2","col3","col4","col5","col6","col7"))
+    tv = ttk.Treeview(nwMainFrame,yscrollcommand=h.set,height=8 ,columns=("col1","col2","col3","col4","col5","col6","col7"))
     tv.column("#0",width=70)
     tv.column("col1",width=70,anchor=CENTER)
     tv.column("col2",width=70,anchor=CENTER)
@@ -170,14 +195,14 @@ def openNewWindow():
     tv.heading("col5",text="D-ADDR",anchor=CENTER)
     tv.heading("col6",text="LOADED-T",anchor=CENTER)
     tv.heading("col7",text="MARK",anchor=CENTER) 
-    tv.grid(row=1,column=0)
+    tv.grid(row=3,column=0, pady=5)
 
     h.configure(command=tv.yview)
-    h.grid(row=1,column=1,rowspan=1,sticky=NS)
+    h.grid(row=3,column=1,rowspan=1,sticky=NS)
  
 
     #Inferior
-    tvi1 = ttk.Treeview(nwMainFrame, columns=("col1"))
+    tvi1 = ttk.Treeview(nwMainFrame, height=1, columns=("col1"))
     tvi1.column("#0",width=70)
     tvi1.column("col1",width=70,anchor=CENTER)
    
@@ -185,10 +210,10 @@ def openNewWindow():
     tvi1.heading("#0",text="Processes", anchor=CENTER)
     tvi1.heading("col1",text="Sim-Time",anchor=CENTER)
    
-    tvi1.grid(row=2,column=0)
+    tvi1.grid(row=4,column=0, pady=5)
 
 
-    tvi2 = ttk.Treeview(nwMainFrame, columns=("col1","col2","col3"))
+    tvi2 = ttk.Treeview(nwMainFrame,height=1, columns=("col1","col2","col3"))
     tvi2.column("#0",width=70)
     tvi2.column("col1",width=70,anchor=CENTER)
     tvi2.column("col2",width=70,anchor=CENTER)
@@ -200,15 +225,15 @@ def openNewWindow():
     tvi2.heading("col2",text="V-RAM KB",anchor=CENTER)
     tvi2.heading("col3",text="V-RAM %",anchor=CENTER)
     
-    tvi2.grid(row=3,column=0)
+    tvi2.grid(row=5,column=0, pady=5)
 
 
-    tvi3 = ttk.Treeview(nwMainFrame, columns=("col1","col2","col3","col4"))
-    tvi3.column("#0",width=70)
-    tvi3.column("col1",width=70,anchor=CENTER)
-    tvi3.column("col2",width=70,anchor=CENTER)
-    tvi3.column("col3",width=70,anchor=CENTER)
-    tvi3.column("col4",width=70,anchor=CENTER)
+    tvi3 = ttk.Treeview(nwMainFrame, height=1, columns=("col1","col2","col3","col4"))
+    tvi3.column("#0",width=75)
+    tvi3.column("col1",width=75,anchor=CENTER)
+    tvi3.column("col2",width=75,anchor=CENTER)
+    tvi3.column("col3",width=75,anchor=CENTER)
+    tvi3.column("col4",width=75,anchor=CENTER)
     
     
     tvi3.heading("#0",text="P-LOADED", anchor=CENTER)
@@ -217,19 +242,40 @@ def openNewWindow():
     tvi3.heading("col3",text="Trashing-%",anchor=CENTER)
     tvi3.heading("col4",text="Fragmentación",anchor=CENTER)
     
-    tvi3.grid(row=4,column=0)
+    tvi3.grid(row=6,column=0, pady=5)
 
 
 
     #------------------------------------------------------------------------------
+    # Ram del OTP
+    Label(nwMainFrame, text="RAM-" + selected.get(), justify="center").grid(row=0, column=2)
+
+    # Create a Figure object
+    fig1 = Figure(figsize=(5, 1), dpi=100)
+
+    # Create a table
+    table_data1 = [[]]
+    for i in range(100):
+        table_data1[0].append(" ")
+    table1 = fig1.add_subplot(111)
+    table1.axis('off')  # Hide the axes
+    table1.axis('tight')
+    table1.table(cellText=table_data1, loc='center')
+
+    # Create a Tkinter canvas that can display the figure
+    canvas1 = FigureCanvasTkAgg(fig1, master=nwMainFrame)
+    canvas1.draw()
+
+    # Pack the canvas into the tkinter window
+    canvas1.get_tk_widget().grid(row=1, column=2, columnspan=1)
 
     #Tabla del algoritmo a comparar
 
     h2 = Scrollbar(nwMainFrame, orient='vertical')
 
-    Label(nwMainFrame, text="MMU-" + selected.get(),justify="center").grid(row=0, column=2)
+    Label(nwMainFrame, text="MMU-" + selected.get(),justify="center").grid(row=2, column=2)
 
-    tv1 = ttk.Treeview(nwMainFrame,yscrollcommand=h2.set, columns=("col1","col2","col3","col4","col5","col6","col7"))
+    tv1 = ttk.Treeview(nwMainFrame,yscrollcommand=h2.set, height=8, columns=("col1","col2","col3","col4","col5","col6","col7"))
     tv1.column("#0",width=70)
     tv1.column("col1",width=70,anchor=CENTER)
     tv1.column("col2",width=70,anchor=CENTER)
@@ -247,13 +293,13 @@ def openNewWindow():
     tv1.heading("col5",text="D-ADDR",anchor=CENTER)
     tv1.heading("col6",text="LOADED-T",anchor=CENTER)
     tv1.heading("col7",text="MARK",anchor=CENTER) 
-    tv1.grid(row=1,column=2)
+    tv1.grid(row=3,column=2, pady=5)
    
     h2.configure(command=tv1.yview)
-    h2.grid(row=1,column=3,rowspan=1,sticky=NS)
+    h2.grid(row=3,column=3,rowspan=1,sticky=NS)
 
      #Inferior
-    tv1i1 = ttk.Treeview(nwMainFrame, columns=("col1"))
+    tv1i1 = ttk.Treeview(nwMainFrame, height=1, columns=("col1"))
     tv1i1.column("#0",width=70)
     tv1i1.column("col1",width=70,anchor=CENTER)
    
@@ -261,10 +307,10 @@ def openNewWindow():
     tv1i1.heading("#0",text="Processes", anchor=CENTER)
     tv1i1.heading("col1",text="Sim-Time",anchor=CENTER)
    
-    tv1i1.grid(row=2,column=2)
+    tv1i1.grid(row=4,column=2, pady=5)
 
 
-    tv1i2 = ttk.Treeview(nwMainFrame, columns=("col1","col2","col3"))
+    tv1i2 = ttk.Treeview(nwMainFrame,height=1, columns=("col1","col2","col3"))
     tv1i2.column("#0",width=70)
     tv1i2.column("col1",width=70,anchor=CENTER)
     tv1i2.column("col2",width=70,anchor=CENTER)
@@ -276,15 +322,15 @@ def openNewWindow():
     tv1i2.heading("col2",text="V-RAM KB",anchor=CENTER)
     tv1i2.heading("col3",text="V-RAM %",anchor=CENTER)
     
-    tv1i2.grid(row=3,column=2)
+    tv1i2.grid(row=5,column=2, pady=5)
 
 
-    tv1i3 = ttk.Treeview(nwMainFrame, columns=("col1","col2","col3","col4"))
-    tv1i3.column("#0",width=70)
-    tv1i3.column("col1",width=70,anchor=CENTER)
-    tv1i3.column("col2",width=70,anchor=CENTER)
-    tv1i3.column("col3",width=70,anchor=CENTER)
-    tv1i3.column("col4",width=70,anchor=CENTER)
+    tv1i3 = ttk.Treeview(nwMainFrame, height=1, columns=("col1","col2","col3","col4"))
+    tv1i3.column("#0",width=75)
+    tv1i3.column("col1",width=75,anchor=CENTER)
+    tv1i3.column("col2",width=75,anchor=CENTER)
+    tv1i3.column("col3",width=75,anchor=CENTER)
+    tv1i3.column("col4",width=75,anchor=CENTER)
     
     
     tv1i3.heading("#0",text="P-LOADED", anchor=CENTER)
@@ -293,7 +339,7 @@ def openNewWindow():
     tv1i3.heading("col3",text="Trashing-%",anchor=CENTER)
     tv1i3.heading("col4",text="Fragmentación",anchor=CENTER)
     
-    tv1i3.grid(row=4,column=2)
+    tv1i3.grid(row=6,column=2, pady=5)
 
 
 #Creacion del frame raiz
