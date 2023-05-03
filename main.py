@@ -125,23 +125,20 @@ def fileGenerator(seed, p, n):
 
 #Creacion de la nueva ventana
 def openNewWindow():
-    global selected, instructions, MMU_OPT, MMU_RND
+    global selected, instructions, MMU_OPT, MMU_RND, fileSelected, filename
 
-    fileGenerator(seedEntry.get(), int(pselected.get()), int(opselected.get()))
-    #fileGenerator(0,10,176)
+    if fileSelected == True:
+        open_document(filename)
+    else:
+        # fileGenerator(0,10,176)
+        fileGenerator(seedEntry.get(), int(pselected.get()), int(opselected.get()))
+        open_document("generatedFile.txt")
+
+
     newWindow = Toplevel(root)
     newWindow.title("Ejecuntando")
     
     # VERIFICAR
-
-    """
-    for instruction in instructions:
-        MMU_OPT.simulate(instruction)
-        #print(MMU_OPT.RAM.available_ram)
-        MMU_RND.simulate(instruction)
-        #print(MMU_RND.RAM.available_ram)
-        #OBTENER DATOS Y GRAFICAR
-    """
 
     #Creacion del mainframe de a la ventana emergente 
 
@@ -151,7 +148,8 @@ def openNewWindow():
 
     nwMainFrame.config(width="720",height="650")
 
-    #Ram del OTP
+    #Ram del OTP    
+
     Label(nwMainFrame, text="RAM-OTP", justify="center").grid(row=0, column=0)
     # Create a Figure object
     fig = Figure(figsize=(5, 1), dpi=100)
@@ -341,6 +339,51 @@ def openNewWindow():
     
     tv1i3.grid(row=6,column=2, pady=5)
 
+    #_____________________________________________________________________
+    #definicion de la funcion para actualizar el contenido de las tablas
+    def updateWindowContent():
+        print("Actualizando")
+
+    #_____________________________________________________________________
+    #For de la ejecución de los algoritmos y actualización de las tablas
+    if selected.get() == "FIFO":
+
+        for instruction in instructions:
+            MMU_OPT.simulate(instruction)
+            # print(MMU_OPT.RAM.available_ram)
+            MMU_RND.simulate(instruction)
+            # print(MMU_RND.RAM.available_ram)
+            updateWindowContent()
+
+    if selected.get() == "FIFO":
+
+        for instruction in instructions:
+            MMU_OPT.simulate(instruction)
+            # print(MMU_OPT.RAM.available_ram)
+            MMU_RND.simulate(instruction)
+            # print(MMU_RND.RAM.available_ram)
+            updateWindowContent()
+
+    if selected.get() == "FIFO":
+
+        for instruction in instructions:
+            MMU_OPT.simulate(instruction)
+            # print(MMU_OPT.RAM.available_ram)
+            MMU_RND.simulate(instruction)
+            # print(MMU_RND.RAM.available_ram)
+            updateWindowContent()
+
+    if selected.get() == "FIFO":
+
+        for instruction in instructions:
+            MMU_OPT.simulate(instruction)
+            # print(MMU_OPT.RAM.available_ram)
+            MMU_RND.simulate(instruction)
+            # print(MMU_RND.RAM.available_ram)
+            updateWindowContent()
+
+    else:
+        print("Ocurrio un error al determinar que algoritmo escoger")
 
 #Creacion del frame raiz
 root = Tk()
