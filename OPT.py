@@ -67,8 +67,8 @@ class OPT:
         instructions_use = [int(ins[1]) for ins in instructions
                             if ins[0] == "use" and int(ins[1]) in ptr_page_loaded and int(ins[1]) != ptr_id]
 
-        #print("PTR  PAGE LOADED", ptr_page_loaded)
-        #print("INSTRUCTION USE", instructions_use)
+        # print("PTR  PAGE LOADED", ptr_page_loaded)
+        # print("INSTRUCTION USE", instructions_use)
         ptrs_next_use = []
         unload_complete = False
 
@@ -77,10 +77,10 @@ class OPT:
                 pages_to_unload = [page for page in self.pages_loaded if page[0] == ptr_id]
                 order_to_unload = []
                 for page in pages_to_unload:  # Se bajan todas las páginas que no se vuelven a utilizar
-                    #print("page_to_unload", page)
+                    # print("page_to_unload", page)
                     self.pages_loaded.remove(page)  # Se baja la página de RAM
                     self.pages_in_disk.append(page)  # Se sube la página en Disco
-                    order_to_unload.append(page) # Se hace una lista de las páginas a bajar en un solo paging
+                    order_to_unload.append(page)  # Se hace una lista de las páginas a bajar en un solo paging
                     self.increase_ram(self.page_size)  # Se aumenta la RAM en 1 tamaño de página
                 unload_complete = True
                 self.include_to_queue(order_to_unload)
@@ -163,7 +163,7 @@ class OPT:
                         if self.RAM >= self.page_size:
                             self.decrease_ram(self.page_size)
                             self.load_in_ram(ptr_id, page)
-                            self.pages_in_disk.remove((ptr_id, page)) # REVISAR
+                            self.pages_in_disk.remove((ptr_id, page))  # REVISAR
                         else:
                             instruction2 = self.instructions[ins:].copy()
                             self.decrease_ram(self.page_size)
@@ -194,7 +194,28 @@ class OPT:
         return self.order_to_unload
 
 
-#x = OPT('generatedFile.txt')
-x = OPT('Test.txt')
+def open_document(filename):
+    instructions = []
+    with open(filename, "r") as file:
+        for line in file:
+            instruction = line.split("(")
+            if instruction[0] == "new":
+                data = instruction[1].split(",")
+                instruction[1] = data[0]
+                if data[1][-1] == "\n":
+                    instruction.append(data[1][:-2])
+                else:
+                    instruction.append(data[1][:-1])
+            elif instruction[0] == "use" or instruction[0] == "delete" or instruction[0] == "kill":
+                if instruction[1][-1] == "\n":
+                    instruction[1] = instruction[1][:-2]
+                else:
+                    instruction[1] = instruction[1][:-1]
+            instructions.append(instruction)
+
+    return instructions
+
+
+x = OPT(open_document("Test.txt"))
 print(x.process_commands())
 print(x.instructions)
