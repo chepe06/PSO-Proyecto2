@@ -23,8 +23,15 @@ class MMU:
     def get_percent_ram_used(self):
         return (self.RAM.available_ram / self.RAM.total_ram) * 100
 
+    def get_used_ram(self):
+        return self.RAM.available_ram
+
     def get_percent_disk_used(self):
         return (self.disk.used_memory / self.RAM.total_ram) * 100
+    
+
+    def get_used_disk(self):
+        return self.disk.used_memory
 
     def get_simulation_time(self):
         return self.simulation_time

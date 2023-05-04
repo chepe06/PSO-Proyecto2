@@ -147,7 +147,7 @@ def openNewWindow():
 
     Label(nwMainFrame, text="RAM-OTP", justify="center").grid(row=0, column=0)
     # Create a Figure object
-    fig = Figure(figsize=(5, 1), dpi=100)
+    fig = Figure(figsize=(6, 1), dpi=100)
 
     # Create a table
     table_data = [[]]
@@ -247,7 +247,7 @@ def openNewWindow():
     Label(nwMainFrame, text="RAM-" + selected.get(), justify="center").grid(row=0, column=2)
 
     # Create a Figure object
-    fig1 = Figure(figsize=(5, 1), dpi=100)
+    fig1 = Figure(figsize=(6, 1), dpi=100)
 
     # Create a table
     table_data1 = [[]]
@@ -354,8 +354,14 @@ def openNewWindow():
             indx+=1
             segTime +=1
         
+        tvi1.delete(*tvi1.get_children())
+        tvi1.insert(parent="",index=0,text="?",values=(str(MMU_OPT.get_simulation_time())))
 
-        
+        tvi2.delete(*tvi2.get_children())
+        tvi2.insert(parent="",index=0,text=str(MMU_OPT.get_used_ram()),values=(str(MMU_OPT.get_percent_ram_used()),str(MMU_OPT.get_used_disk()),str(MMU_OPT.get_percent_disk_used())))
+
+        tvi3.delete(*tvi3.get_children())
+        tvi3.insert(parent="",index=0,text="?",values=("?",str(MMU_OPT.get_thrashing()),str(MMU_OPT.get_percent_thrashing()),str(MMU_OPT.get_fragmentation())))
 
         #--------------------------------------------------------------
         #Actualizar las tabalas del Algoritmo comparado
@@ -365,6 +371,15 @@ def openNewWindow():
             tv1.insert(parent="",index=str(indxAux),text=str(indxAux),values=(str(pg.get_page_id()),str(pg.get_pid()),str(pg.get_flag()),str(pg.get_page_id()),str(pg.get_ptr_id()),str(pg.get_direction()),str(segTimeAux)+"s",""))
             indxAux+=1
             segTimeAux +=1
+
+        tv1i1.delete(*tv1i1.get_children())
+        tv1i1.insert(parent="",index=0,text="?",values=(str(MMU_RND.get_simulation_time())))
+
+        tv1i2.delete(*tv1i2.get_children())
+        tv1i2.insert(parent="",index=0,text=str(MMU_RND.get_used_ram()),values=(str(MMU_RND.get_percent_ram_used()),str(MMU_RND.get_used_disk()),str(MMU_RND.get_percent_disk_used())))
+
+        tv1i3.delete(*tv1i3.get_children())
+        tv1i3.insert(parent="",index=0,text="?",values=("?",str(MMU_RND.get_thrashing()),str(MMU_RND.get_percent_thrashing()),str(MMU_RND.get_fragmentation())))
 
     #print(MMU_OPT.RAM.get_pids_loaded())
     #print(MMU_OPT.get_memory_table()[1])
