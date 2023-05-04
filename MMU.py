@@ -17,6 +17,27 @@ class MMU:
         self.simulation_time = 0
         self.thrashing = 0
 
+    def get_memory_table(self):
+        return self.memory_table
+
+    def get_percent_ram_used(self):
+        return (self.RAM.available_ram / self.RAM.total_ram) * 100
+
+    def get_percent_disk_used(self):
+        return (self.disk.used_memory / self.RAM.total_ram) * 100
+
+    def get_simulation_time(self):
+        return self.simulation_time
+
+    def get_thrashing(self):
+        return self.thrashing
+
+    def get_percent_thrashing(self):
+        return (self.thrashing / self.simulation_time) * 100
+
+    def get_fragmentation(self):
+        return self.fragmentation
+
     def increment_page_id(self):
         self.page_id = self.page_id + 1
 
@@ -54,9 +75,6 @@ class MMU:
 
     def create_page(self, pid, size):
         return Page(pid, self.ptr_id, self.page_id, -1, True, size)
-
-    def get_table_mem(self):
-        return self.memory_table
 
     def add_page_to_memory_table(self, key, value):  # KEY -> PID - VALUE -> {} // KEY -> PTR - VALUE -> [ PAGE ID, ]
         temp = self.memory_table
