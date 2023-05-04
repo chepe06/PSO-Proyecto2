@@ -1,4 +1,6 @@
 import random
+import time
+import threading
 
 from tkinter import *
 # import filedialog module
@@ -6,7 +8,7 @@ from tkinter import filedialog
 
 #ttk import
 from tkinter import ttk
-
+tv = ""
 
 from RAM import RAM
 from Disk import Disk
@@ -18,6 +20,9 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 
 #Variables globales
+paused = False
+segTime = 0
+segTimeAux = 0
 filename = ""
 fileSelected = False
 
@@ -123,22 +128,12 @@ def fileGenerator(seed, p, n):
             f.write(i)
 
 
+
 #Creacion de la nueva ventana
 def openNewWindow():
-    global selected, instructions, MMU_OPT, MMU_RND, fileSelected, filename
-
-    if fileSelected == True:
-        instructions=open_document(filename)
-    else:
-        # fileGenerator(0,10,176)
-        fileGenerator(seedEntry.get(), int(pselected.get()), int(opselected.get()))
-        instructions=open_document("generatedFile.txt")
-
-
+    
     newWindow = Toplevel(root)
     newWindow.title("Ejecuntando")
-    
-    # VERIFICAR
 
     #Creacion del mainframe de a la ventana emergente 
 
@@ -172,11 +167,13 @@ def openNewWindow():
 
     #Tabla del OPT
     Label(nwMainFrame, text="MMU-OPT" ,justify="center").grid(row=2, column=0)
-    
+
+    global tv
     h = Scrollbar(nwMainFrame, orient='vertical')
 
-    tv = ttk.Treeview(nwMainFrame,yscrollcommand=h.set,height=8 ,columns=("col1","col2","col3","col4","col5","col6","col7"))
+    tv = ttk.Treeview(nwMainFrame,yscrollcommand=h.set,height=8 ,columns=("col0","col1","col2","col3","col4","col5","col6","col7"))
     tv.column("#0",width=70)
+    tv.column("col0",width=70,anchor=CENTER)
     tv.column("col1",width=70,anchor=CENTER)
     tv.column("col2",width=70,anchor=CENTER)
     tv.column("col3",width=70,anchor=CENTER)
@@ -185,7 +182,8 @@ def openNewWindow():
     tv.column("col6",width=70,anchor=CENTER)
     tv.column("col7",width=70,anchor=CENTER)
     
-    tv.heading("#0",text="PAGE ID", anchor=CENTER)
+    tv.heading("#0",text="INDEX", anchor=CENTER)
+    tv.heading("col0",text="PAGE ID",anchor=CENTER)
     tv.heading("col1",text="PID",anchor=CENTER)
     tv.heading("col2",text="LOADED",anchor=CENTER)
     tv.heading("col3",text="L-ADDR",anchor=CENTER)
@@ -245,7 +243,7 @@ def openNewWindow():
 
 
     #------------------------------------------------------------------------------
-    # Ram del OTP
+    # Ram del Algoritmo a comparar
     Label(nwMainFrame, text="RAM-" + selected.get(), justify="center").grid(row=0, column=2)
 
     # Create a Figure object
@@ -273,8 +271,9 @@ def openNewWindow():
 
     Label(nwMainFrame, text="MMU-" + selected.get(),justify="center").grid(row=2, column=2)
 
-    tv1 = ttk.Treeview(nwMainFrame,yscrollcommand=h2.set, height=8, columns=("col1","col2","col3","col4","col5","col6","col7"))
+    tv1 = ttk.Treeview(nwMainFrame,yscrollcommand=h2.set, height=8, columns=("col0","col1","col2","col3","col4","col5","col6","col7"))
     tv1.column("#0",width=70)
+    tv1.column("col0",width=70,anchor=CENTER)
     tv1.column("col1",width=70,anchor=CENTER)
     tv1.column("col2",width=70,anchor=CENTER)
     tv1.column("col3",width=70,anchor=CENTER)
@@ -283,7 +282,8 @@ def openNewWindow():
     tv1.column("col6",width=70,anchor=CENTER)
     tv1.column("col7",width=70,anchor=CENTER)
     
-    tv1.heading("#0",text="PAGE ID", anchor=CENTER)
+    tv1.heading("#0",text="INDEX", anchor=CENTER)
+    tv1.heading("col0",text="PAGE ID",anchor=CENTER)
     tv1.heading("col1",text="PID",anchor=CENTER)
     tv1.heading("col2",text="LOADED",anchor=CENTER)
     tv1.heading("col3",text="L-ADDR",anchor=CENTER)
@@ -342,59 +342,102 @@ def openNewWindow():
     #_____________________________________________________________________
     #definicion de la funcion para actualizar el contenido de las tablas
     def updateWindowContent():
-        MMU_OPT.get_memory_table()
+        global segTime, segTimeAux
+        indx=0
+        indxAux=0
+    #--------------------------------------------------------------
+    #Actualizar las tabalas del OTP
+        tv.delete(*tv.get_children())
 
-        #print(MMU_OPT.RAM.get_pids_loaded())
-        #print(MMU_OPT.get_memory_table()[1])
-        print("------------------------------------------------------------------------------------------------------------------")
+        for pg in MMU_OPT.get_memory_table().values():
+            tv.insert(parent="",index=str(indx),text=str(indx),values=(str(pg.get_page_id()),str(pg.get_pid()),str(pg.get_flag()),str(pg.get_page_id()),str(pg.get_ptr_id()),str(pg.get_direction()),str(segTime)+"s",""))
+            indx+=1
+            segTime +=1
+        
 
-    #_____________________________________________________________________
-    #For de la ejecución de los algoritmos y actualización de las tablas
-    from OPT import OPT
-    OPT = OPT(instructions, TOTAL_RAM, PAGE_SIZE)
-    order_to_unload = OPT.process_commands()
-    RAM1 = RAM(TOTAL_RAM, AMOUNT_PAGES, PAGE_SIZE)
-    RAM2 = RAM(TOTAL_RAM, AMOUNT_PAGES, PAGE_SIZE)
-    DISK1 = Disk(PAGE_SIZE)
-    DISK2 = Disk(PAGE_SIZE)
-    MMU_OPT = MMU_OPT(RAM1, DISK1, order_to_unload)
+        
 
-    if selected.get() == "RND":
-        MMU_RND = MMU_RND(RAM2, DISK2, seedEntry.get())
-        for instruction in instructions:
-            MMU_OPT.simulate(instruction)
-            # print(MMU_OPT.RAM.available_ram)
-            MMU_RND.simulate(instruction)
-            # print(MMU_RND.RAM.available_ram)
-            updateWindowContent()
+        #--------------------------------------------------------------
+        #Actualizar las tabalas del Algoritmo comparado
+        tv1.delete(*tv1.get_children())
 
-    if selected.get() == "FIFO":
+        for pg in MMU_RND.get_memory_table().values():
+            tv1.insert(parent="",index=str(indxAux),text=str(indxAux),values=(str(pg.get_page_id()),str(pg.get_pid()),str(pg.get_flag()),str(pg.get_page_id()),str(pg.get_ptr_id()),str(pg.get_direction()),str(segTimeAux)+"s",""))
+            indxAux+=1
+            segTimeAux +=1
 
-        for instruction in instructions:
-            MMU_OPT.simulate(instruction)
-            # print(MMU_OPT.RAM.available_ram)
-            MMU_RND.simulate(instruction)
-            # print(MMU_RND.RAM.available_ram)
-            updateWindowContent()
+    #print(MMU_OPT.RAM.get_pids_loaded())
+    #print(MMU_OPT.get_memory_table()[1])
 
-    if selected.get() == "MRU":
+    #___________________________________________________________________________
+    #Funcion que inicia el programa
+    def startProgram():
 
-        for instruction in instructions:
-            MMU_OPT.simulate(instruction)
-            # print(MMU_OPT.RAM.available_ram)
-            MMU_RND.simulate(instruction)
-            # print(MMU_RND.RAM.available_ram)
-            updateWindowContent()
+        global selected, instructions, MMU_OPT, MMU_RND, fileSelected, filename
 
-    if selected.get() == "SC":
+        if fileSelected == True:
+            instructions=open_document(filename)
+        else:
+            # fileGenerator(0,10,176)
+            fileGenerator(seedEntry.get(), int(pselected.get()), int(opselected.get()))
+            instructions=open_document("generatedFile.txt")
 
-        for instruction in instructions:
-            MMU_OPT.simulate(instruction)
-            # print(MMU_OPT.RAM.available_ram)
-            MMU_RND.simulate(instruction)
-            # print(MMU_RND.RAM.available_ram)
-            updateWindowContent()
+        #_____________________________________________________________________
+        #For de la ejecución de los algoritmos y actualización de las tablas
+        from OPT import OPT
+        OPT = OPT(instructions, TOTAL_RAM, PAGE_SIZE)
+        order_to_unload = OPT.process_commands()
+        RAM1 = RAM(TOTAL_RAM, AMOUNT_PAGES, PAGE_SIZE)
+        RAM2 = RAM(TOTAL_RAM, AMOUNT_PAGES, PAGE_SIZE)
+        DISK1 = Disk(PAGE_SIZE)
+        DISK2 = Disk(PAGE_SIZE)
+        MMU_OPT = MMU_OPT(RAM1, DISK1, order_to_unload)
 
+        if selected.get() == "RND":
+            MMU_RND = MMU_RND(RAM2, DISK2, seedEntry.get())
+            for instruction in instructions:
+                MMU_OPT.simulate(instruction)
+                # print(MMU_OPT.RAM.available_ram)
+                MMU_RND.simulate(instruction)
+                # print(MMU_RND.RAM.available_ram)
+                updateWindowContent()
+                time.sleep(1)
+
+        """if selected.get() == "FIFO":
+
+            for instruction in instructions:
+                MMU_OPT.simulate(instruction)
+                # print(MMU_OPT.RAM.available_ram)
+                MMU_RND.simulate(instruction)
+                # print(MMU_RND.RAM.available_ram)
+                updateWindowContent()
+
+        if selected.get() == "MRU":
+
+            for instruction in instructions:
+                MMU_OPT.simulate(instruction)
+                # print(MMU_OPT.RAM.available_ram)
+                MMU_RND.simulate(instruction)
+                # print(MMU_RND.RAM.available_ram)
+                updateWindowContent()
+
+        if selected.get() == "SC":
+
+            for instruction in instructions:
+                MMU_OPT.simulate(instruction)
+                # print(MMU_OPT.RAM.available_ram)
+                MMU_RND.simulate(instruction)
+                # print(MMU_RND.RAM.available_ram)
+                updateWindowContent()
+        """
+    
+    startProgram()
+
+#Esta funcion crea un thread para manejar la ventana mientras el proceso del algoritmo y la actualizacion corren detras
+
+def createAndStartThread():
+    subproceso = subproceso = threading.Thread(target=openNewWindow)
+    subproceso.start()
 
 #Creacion del frame raiz
 root = Tk()
@@ -491,7 +534,7 @@ MMU_RND = MMU_RND(RAM2, DISK2, seed)
 """
 
 
-btnRun = Button(mainFrame,text="Correr", command =  openNewWindow )
+btnRun = Button(mainFrame,text="Correr", command =  createAndStartThread )
 btnRun.grid(row=5,column=1)
 btnRun.config(cursor="hand2")
 
