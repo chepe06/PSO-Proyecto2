@@ -15,6 +15,9 @@ class RAM:
     def get_memory(self):
         return self.memory
 
+    def get_pids_loaded(self):
+        return [page.get_pid() for page in self.memory]
+
     # FUNCTIONS
 
     def create_empty_ram(self):
