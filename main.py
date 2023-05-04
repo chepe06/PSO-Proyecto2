@@ -7,7 +7,7 @@ from tkinter import filedialog
 #ttk import
 from tkinter import ttk
 
-from OPT import OPT
+
 from RAM import RAM
 from Disk import Disk
 from MMU_OPT import MMU_OPT
@@ -22,9 +22,9 @@ filename = ""
 fileSelected = False
 
 # COMPUTER
-TOTAL_RAM = 1000
-AMOUNT_PAGES = 10
-PAGE_SIZE = 100
+TOTAL_RAM = 400000
+AMOUNT_PAGES = 100
+PAGE_SIZE = 4000
 
 
 def open_document(filename):
@@ -128,11 +128,11 @@ def openNewWindow():
     global selected, instructions, MMU_OPT, MMU_RND, fileSelected, filename
 
     if fileSelected == True:
-        open_document(filename)
+        instructions=open_document(filename)
     else:
         # fileGenerator(0,10,176)
         fileGenerator(seedEntry.get(), int(pselected.get()), int(opselected.get()))
-        open_document("generatedFile.txt")
+        instructions=open_document("generatedFile.txt")
 
 
     newWindow = Toplevel(root)
@@ -342,12 +342,25 @@ def openNewWindow():
     #_____________________________________________________________________
     #definicion de la funcion para actualizar el contenido de las tablas
     def updateWindowContent():
-        print("Actualizando")
+        MMU_OPT.get_memory_table()
+
+        #print(MMU_OPT.RAM.get_pids_loaded())
+        #print(MMU_OPT.get_memory_table()[1])
+        print("------------------------------------------------------------------------------------------------------------------")
 
     #_____________________________________________________________________
     #For de la ejecución de los algoritmos y actualización de las tablas
-    if selected.get() == "FIFO":
+    from OPT import OPT
+    OPT = OPT(instructions, TOTAL_RAM, PAGE_SIZE)
+    order_to_unload = OPT.process_commands()
+    RAM1 = RAM(TOTAL_RAM, AMOUNT_PAGES, PAGE_SIZE)
+    RAM2 = RAM(TOTAL_RAM, AMOUNT_PAGES, PAGE_SIZE)
+    DISK1 = Disk(PAGE_SIZE)
+    DISK2 = Disk(PAGE_SIZE)
+    MMU_OPT = MMU_OPT(RAM1, DISK1, order_to_unload)
 
+    if selected.get() == "RND":
+        MMU_RND = MMU_RND(RAM2, DISK2, seedEntry.get())
         for instruction in instructions:
             MMU_OPT.simulate(instruction)
             # print(MMU_OPT.RAM.available_ram)
@@ -364,7 +377,7 @@ def openNewWindow():
             # print(MMU_RND.RAM.available_ram)
             updateWindowContent()
 
-    if selected.get() == "FIFO":
+    if selected.get() == "MRU":
 
         for instruction in instructions:
             MMU_OPT.simulate(instruction)
@@ -373,7 +386,7 @@ def openNewWindow():
             # print(MMU_RND.RAM.available_ram)
             updateWindowContent()
 
-    if selected.get() == "FIFO":
+    if selected.get() == "SC":
 
         for instruction in instructions:
             MMU_OPT.simulate(instruction)
@@ -382,8 +395,6 @@ def openNewWindow():
             # print(MMU_RND.RAM.available_ram)
             updateWindowContent()
 
-    else:
-        print("Ocurrio un error al determinar que algoritmo escoger")
 
 #Creacion del frame raiz
 root = Tk()
