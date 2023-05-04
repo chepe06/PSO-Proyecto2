@@ -117,7 +117,7 @@ class MMU:
             pid = int(instruction[1])
             self.kill(pid)
 
-        """
+
         print("RAM\n")
         print(self.RAM.available_ram)
         [print(p) for p in self.RAM.memory]
@@ -132,4 +132,3 @@ class MMU:
         print(self.simulation_time)
         print("THRASHING")
         print(self.thrashing)
-        """
