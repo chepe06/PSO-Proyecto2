@@ -1,7 +1,7 @@
 import math
 from MMU import MMU
-from RAM import RAM
-from Disk import Disk
+#from RAM import RAM
+#from Disk import Disk
 
 
 class MMU_MRU(MMU):
@@ -13,38 +13,15 @@ class MMU_MRU(MMU):
         page_to_unload = self.recently_used.pop(0)
         real_page = self.RAM.unload_page(page_to_unload.get_page_id())
         real_page.set_flag(False)
+        real_page.set_loaded_time(-1)
         self.add_page_to_memory_table(real_page.page_id,
                                       real_page)  # Se actualiza de la tabla de memoria
         self.disk.load_page(real_page)
 
     def new(self, pid, size):
         page_size = self.RAM.page_size
-        pages = []
+        pages = self.create_pages(pid, size, page_size)
 
-        if size > page_size:  # En caso de que se necesite más de una página
-            pages_amount = math.ceil(size / page_size)
-            fragmentation = (pages_amount * page_size) - size
-            for i in range(pages_amount):
-                if size < page_size:
-                    page = self.create_page(pid, size)
-                else:
-                    page = self.create_page(pid, page_size)
-                size = size - page_size
-                pages.append(page)
-                self.relate_ptr_to_pages(page.page_id)  # Se relaciona el ptr con el page_id
-                self.increment_page_id()
-
-            self.increment_fragmentation(fragmentation)
-
-        else:
-            page = self.create_page(pid, page_size)
-            pages.append(page)
-            self.relate_ptr_to_pages(page.page_id)  # Se relaciona el ptr con el page_id
-            self.increment_page_id()
-            fragmentation = page_size - size
-            self.increment_fragmentation(fragmentation)
-
-        self.relate_pid_to_ptrs(pid)  # Se relaciona el pid con el ptr
         recently = []
         for i in range(len(pages)):
 
@@ -75,6 +52,7 @@ class MMU_MRU(MMU):
 
                 page_to_load = self.disk.unload_page(self.memory_table[page_id])
                 page_to_load.set_flag(True)
+                page_to_load.set_loaded_time(self.simulation_time)
                 page_load = self.RAM.load_page(self.memory_table[page_id])
                 self.recently_used.insert(0, page_load)  # SE AGREGA A LA PÁGINA USADA MÁS RECIENTE
                 self.add_page_to_memory_table(page_load.page_id,
@@ -116,11 +94,11 @@ class MMU_MRU(MMU):
         self.pids.pop(pid)
 
 
+"""
 # COMPUTER
 TOTAL_RAM = 1000
 AMOUNT_PAGES = 10
 PAGE_SIZE = 100
-
 RAM = RAM(TOTAL_RAM, AMOUNT_PAGES, PAGE_SIZE)
 DISK = Disk(PAGE_SIZE)
 MMU_MRU = MMU_MRU(RAM, DISK)
@@ -131,3 +109,4 @@ for x in INSTRUCTIONS:
     #print("RECENTLY USED")
     #[print(p) for p in MMU_MRU.recently_used]
     MMU_MRU.simulate(x)
+"""

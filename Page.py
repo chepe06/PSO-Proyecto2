@@ -1,11 +1,12 @@
 class Page:
-    def __init__(self, pid, ptr_id, page_id, direction, flag, size):
+    def __init__(self, pid, ptr_id, page_id, direction, flag, size, loaded_time):
         self.pid = pid
         self.ptr_id = ptr_id
         self.page_id = page_id
         self.direction = direction
         self.flag = flag
         self.size = size
+        self.loaded_time = loaded_time
 
     def __str__(self):
         text = "pid-" + str(self.pid) + "  page_id-" + str(self.page_id) + "  ptr_id-" + str(self.ptr_id) + \
@@ -31,6 +32,8 @@ class Page:
     def get_size(self):
         return self.size
 
+    def get_loaded_time(self):
+        return self.loaded_time
     # SETTERS
 
     def set_pid(self, pid):
@@ -44,6 +47,9 @@ class Page:
 
     def set_direction(self, direction):
         self.direction = direction
+
+    def set_loaded_time(self, loaded_time):
+        self.loaded_time = loaded_time
 
     # TRUE -> MEMORIA REAL // FALSE -> MEMORIA VIRTUAL
     def set_flag(self, state):

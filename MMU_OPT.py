@@ -1,4 +1,3 @@
-import math
 from MMU import MMU
 #from RAM import RAM
 #from Disk import Disk
@@ -13,38 +12,14 @@ class MMU_OPT(MMU):
         page_to_unload = self.order_to_unload.pop(0)  # Página  por unload
         real_page = self.RAM.unload_page(page_to_unload[1])
         real_page.set_flag(False)
+        real_page.set_loaded_time(-1)
         self.add_page_to_memory_table(real_page.page_id,
                                       real_page)  # Se actualiza de la tabla de memoria
         self.disk.load_page(real_page)
 
     def new(self, pid, size):
         page_size = self.RAM.page_size
-        pages = []
-
-        if size > page_size:  # En caso de que se necesite más de una página
-            pages_amount = math.ceil(size / page_size)
-            fragmentation = (pages_amount * page_size) - size
-            for i in range(pages_amount):
-                if size < page_size:
-                    page = self.create_page(pid, size)
-                else:
-                    page = self.create_page(pid, page_size)
-                size = size - page_size
-                pages.append(page)
-                self.relate_ptr_to_pages(page.page_id)  # Se relaciona el ptr con el page_id
-                self.increment_page_id()
-
-            self.increment_fragmentation(fragmentation)
-
-        else:
-            page = self.create_page(pid, page_size)
-            pages.append(page)
-            self.relate_ptr_to_pages(page.page_id)  # Se relaciona el ptr con el page_id
-            self.increment_page_id()
-            fragmentation = page_size - size
-            self.increment_fragmentation(fragmentation)
-
-        self.relate_pid_to_ptrs(pid)  # Se relaciona el pid con el ptr
+        pages = self.create_pages(pid, size, page_size)
 
         for i in range(len(pages)):
 
@@ -72,6 +47,7 @@ class MMU_OPT(MMU):
 
                 page_to_load = self.disk.unload_page(self.memory_table[page_id])
                 page_to_load.set_flag(True)
+                page_to_load.set_loaded_time(self.simulation_time)
                 page_load = self.RAM.load_page(self.memory_table[page_id])
                 self.add_page_to_memory_table(page_load.page_id,
                                               page_load)  # SE ACTUALIZA DE LA TABLA DE MEMORIA

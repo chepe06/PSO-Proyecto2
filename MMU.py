@@ -1,3 +1,4 @@
+import math
 from Page import Page
 
 
@@ -88,8 +89,37 @@ class MMU:
         else:
             self.pids[pid] = [self.ptr_id]
 
-    def create_page(self, pid, size):
-        return Page(pid, self.ptr_id, self.page_id, -1, True, size)
+    def create_pages(self, pid, size, page_size):
+        pages = []
+        if size > page_size:  # En caso de que se necesite más de una página
+            pages_amount = math.ceil(size / page_size)
+            fragmentation = (pages_amount * page_size) - size
+            for i in range(pages_amount):
+                if size < page_size:
+                    page = self.create_page(pid, size, self.simulation_time)
+                else:
+                    page = self.create_page(pid, page_size, self.simulation_time)
+                size = size - page_size
+                pages.append(page)
+                self.relate_ptr_to_pages(page.page_id)  # Se relaciona el ptr con el page_id
+                self.increment_page_id()
+
+            self.increment_fragmentation(fragmentation)
+
+        else:
+            page = self.create_page(pid, page_size, self.simulation_time)
+            pages.append(page)
+            self.relate_ptr_to_pages(page.page_id)  # Se relaciona el ptr con el page_id
+            self.increment_page_id()
+            fragmentation = page_size - size
+            self.increment_fragmentation(fragmentation)
+
+        self.relate_pid_to_ptrs(pid)  # Se relaciona el pid con el ptr
+
+        return pages
+
+    def create_page(self, pid, size, loaded_time):
+        return Page(pid, self.ptr_id, self.page_id, -1, True, size, loaded_time)
 
     def add_page_to_memory_table(self, key, value):  # KEY -> PID - VALUE -> {} // KEY -> PTR - VALUE -> [ PAGE ID, ]
         temp = self.memory_table

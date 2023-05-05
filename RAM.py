@@ -8,7 +8,7 @@ class RAM:
         self.available_ram = ram
         self.amount_pages = amount_pages
         self.page_size = page_size  # ram // amount_pages
-        self.free_page = Page(0, 0, 0, -1, True, 0)
+        self.free_page = Page(0, 0, 0, -1, True, 0, -1)
         self.memory = self.create_empty_ram()
 
     # GETTERS
