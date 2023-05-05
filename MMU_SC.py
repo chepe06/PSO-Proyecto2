@@ -44,10 +44,12 @@ class MMU_SC(MMU):
         return Page_SC(pid, self.ptr_id, self.page_id, -1, True, size, loaded_time)
 
     def unload_page(self, ptr_id):
+        #print("SECOND_CHANCE_LIST")
+        #[print(p) for p in self.second_chance_list]
         sc = True
         while sc:
             for page in self.second_chance_list:
-                if page.get_life() == 0 and ptr_id != ptr_id:
+                if page.get_life() == 0 and page.get_ptr_id() != ptr_id:
                     self.second_chance_list.remove(page)
                     real_page = self.RAM.unload_page(page.get_page_id())
                     real_page.set_flag(False)
@@ -55,8 +57,8 @@ class MMU_SC(MMU):
                     self.add_page_to_memory_table(real_page.page_id,
                                                   real_page)  # Se actualiza de la tabla de memoria
                     self.disk.load_page(real_page)
-                    print("PAGE UNLOADED")
-                    print(page)
+                    #print("PAGE UNLOADED")
+                    #print(page)
                     sc = False
                     break
                 else:
@@ -97,23 +99,16 @@ class MMU_SC(MMU):
                 page_to_load = self.disk.unload_page(self.memory_table[page_id])
                 page_to_load.set_flag(True)
                 page_to_load.set_loaded_time(self.simulation_time)
+                page_to_load.set_life(1)
                 page_load = self.RAM.load_page(self.memory_table[page_id])
                 self.second_chance_list.append(page_load)  # SE AGREGA A LA COLA
                 self.add_page_to_memory_table(page_load.page_id,
                                               page_load)  # SE ACTUALIZA DE LA TABLA DE MEMORIA
 
             else:  # HIT
-                print("SECOND CHANCE LIST ANTES")
-                [print(p) for p in self.second_chance_list]
                 for p in self.second_chance_list:
-                    print("p.get_page_id", p.get_page_id())
-                    print("page_id", page_id)
                     if p.get_page_id() == page_id:
-                        print("asdasdas")
                         p.set_life(1)
-                #[p.set_life(1) for p in self.second_chance_list if p.get_page_id() == page_id]
-                #print("SECOND CHANCE LIST")
-                #[print(p) for p in self.second_chance_list]
 
                 self.increment_simulation_time()
 
