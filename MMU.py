@@ -144,6 +144,8 @@ class MMU:
         pass
 
     def simulate(self, instruction):
+        print("--------------------------------------------")
+        print(instruction)
         self.increment_simulation_time()
         if instruction[0] == "new":
             pid = int(instruction[1])
@@ -162,7 +164,7 @@ class MMU:
             pid = int(instruction[1])
             self.kill(pid)
 
-        """
+
         print("RAM\n")
         print(self.RAM.available_ram)
         [print(p) for p in self.RAM.memory]
@@ -171,9 +173,11 @@ class MMU:
         [print(p) for p in self.disk.memory]
         print("MEM TABLE\n")
         [print(p, " - ", self.memory_table[p]) for p in self.memory_table]
+        """
         print("FRAGMENTATION")
         print(self.fragmentation)
         print("SIMULATION TIME")
         print(self.simulation_time)
         print("THRASHING")
-        print(self.thrashing)"""
+        print(self.thrashing)
+        """
