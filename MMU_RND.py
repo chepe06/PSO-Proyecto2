@@ -1,4 +1,3 @@
-import math
 import random
 from MMU import MMU
 #from RAM import RAM
