@@ -21,8 +21,6 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 # Variables globales
 paused = False
-segTime = 0
-segTimeAux = 0
 filename = ""
 fileSelected = False
 
@@ -80,7 +78,7 @@ def fileGenerator(seed, p, n):
     killProcess = []
     ptrCount = 1
     comandList = ["new", "use", "delete", "kill"]
-    weights = [0.3, 0.6, 0.05, 0.05]
+    weights = [0.54, 0.44, 0.01, 0.01]
 
     i = 1
     while i <= n and len(killProcess) != p:
@@ -89,7 +87,7 @@ def fileGenerator(seed, p, n):
             rndPID = random.randint(1, p)
             if rndPID not in killProcess:
                 procesList[rndPID] = ptrCount
-                comdList.append(comandList[0] + "(" + str(rndPID) + "," + str(random.randint(50, 1000)) + ")\n")
+                comdList.append(comandList[0] + "(" + str(rndPID) + "," + str(random.randint(1000, 20000)) + ")\n")
                 ptrCount += 1
                 i += 1
 
@@ -330,7 +328,6 @@ def openNewWindow():
     # _____________________________________________________________________
     # definicion de la funcion para actualizar el contenido de las tablas
     def updateWindowContent():
-        global segTime, segTimeAux
         indx = 0
         indxAux = 0
         # --------------------------------------------------------------
@@ -340,20 +337,20 @@ def openNewWindow():
         for pg in MMU_OPT.get_memory_table().values():
             tv.insert(parent="", index=str(indx), text=str(indx), values=(
             str(pg.get_page_id()), str(pg.get_pid()), str(pg.get_flag()), str(pg.get_page_id()), str(pg.get_ptr_id()),
-            str(pg.get_direction()), str(segTime) + "s", ""))
+            str(pg.get_direction()), str(pg.get_loaded_time()) + "s", ""))
             indx += 1
-            segTime += 1
+    
 
         tvi1.delete(*tvi1.get_children())
-        tvi1.insert(parent="", index=0, text="?", values=(str(MMU_OPT.get_simulation_time())))
+        tvi1.insert(parent="", index=0, text=str(MMU_OPT.get_process()), values=(str(MMU_OPT.get_simulation_time())))
 
         tvi2.delete(*tvi2.get_children())
         tvi2.insert(parent="", index=0, text=str(MMU_OPT.get_used_ram()), values=(
         str(MMU_OPT.get_percent_ram_used()), str(MMU_OPT.get_used_disk()), str(MMU_OPT.get_percent_disk_used())))
 
         tvi3.delete(*tvi3.get_children())
-        tvi3.insert(parent="", index=0, text="?", values=(
-        "?", str(MMU_OPT.get_thrashing()), str(MMU_OPT.get_percent_thrashing()), str(MMU_OPT.get_fragmentation())))
+        tvi3.insert(parent="", index=0, text=str(MMU_OPT.get_pages_loaded()), values=(
+        str(MMU_OPT.get_pages_unloaded()), str(MMU_OPT.get_thrashing()), str(MMU_OPT.get_percent_thrashing()), str(MMU_OPT.get_fragmentation())))
 
         # --------------------------------------------------------------
         # Actualizar las tabalas del Algoritmo comparado
@@ -362,20 +359,20 @@ def openNewWindow():
         for pg2 in MMU_RND.get_memory_table().values():
             tv1.insert(parent="", index=str(indxAux), text=str(indxAux), values=(
             str(pg2.get_page_id()), str(pg2.get_pid()), str(pg2.get_flag()), str(pg2.get_page_id()),
-            str(pg2.get_ptr_id()), str(pg2.get_direction()), str(segTimeAux) + "s", ""))
+            str(pg2.get_ptr_id()), str(pg2.get_direction()), str(pg.get_loaded_time()) + "s", ""))
             indxAux += 1
-            segTimeAux += 1
+           
 
         tv1i1.delete(*tv1i1.get_children())
-        tv1i1.insert(parent="", index=0, text="?", values=(str(MMU_RND.get_simulation_time())))
+        tv1i1.insert(parent="", index=0, text=str(MMU_RND.get_process()), values=(str(MMU_RND.get_simulation_time())))
 
         tv1i2.delete(*tv1i2.get_children())
         tv1i2.insert(parent="", index=0, text=str(MMU_RND.get_used_ram()), values=(
         str(MMU_RND.get_percent_ram_used()), str(MMU_RND.get_used_disk()), str(MMU_RND.get_percent_disk_used())))
 
         tv1i3.delete(*tv1i3.get_children())
-        tv1i3.insert(parent="", index=0, text="?", values=(
-        "?", str(MMU_RND.get_thrashing()), str(MMU_RND.get_percent_thrashing()), str(MMU_RND.get_fragmentation())))
+        tv1i3.insert(parent="", index=0, text=str(MMU_RND.get_pages_loaded()), values=(
+        str(MMU_RND.get_pages_unloaded()), str(MMU_RND.get_thrashing()), str(MMU_RND.get_percent_thrashing()), str(MMU_RND.get_fragmentation())))
 
     # print(MMU_OPT.RAM.get_pids_loaded())
     # print(MMU_OPT.get_memory_table()[1])
