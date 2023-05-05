@@ -11,8 +11,8 @@ class MMU:
 
         # MAPA DE MEMORIA
         self.memory_table = {}  # KEY -> PAGE_ID - VALUE -> PAGE()
-        self.ptrs = {}          # KEY -> PTR_ID  - VALUE -> [PAGE_ID, ...]
-        self.pids = {}          # KEY -> PID     - VALUE -> [PTR_ID , ...]
+        self.ptrs = {}  # KEY -> PTR_ID  - VALUE -> [PAGE_ID, ...]
+        self.pids = {}  # KEY -> PID     - VALUE -> [PTR_ID , ...]
 
         self.simulation_time = 0
         self.thrashing = 0
@@ -20,15 +20,23 @@ class MMU:
     def get_memory_table(self):
         return self.memory_table
 
+    def get_process(self):
+        return len(self.pids)
+
+    def get_pages_loaded(self):
+        return (self.RAM.total_ram - self.RAM.available_ram) / self.RAM.page_size
+
+    def get_pages_unloaded(self):
+        return self.disk.used_memory / self.disk.page_size
+
     def get_percent_ram_used(self):
-        return (self.RAM.available_ram / self.RAM.total_ram) * 100
+        return ((self.RAM.total_ram - self.RAM.available_ram) / self.RAM.total_ram) * 100
 
     def get_used_ram(self):
-        return self.RAM.available_ram
+        return self.RAM.total_ram - self.RAM.available_ram
 
     def get_percent_disk_used(self):
         return (self.disk.used_memory / self.RAM.total_ram) * 100
-    
 
     def get_used_disk(self):
         return self.disk.used_memory
@@ -124,7 +132,7 @@ class MMU:
             pid = int(instruction[1])
             self.kill(pid)
 
-
+        """
         print("RAM\n")
         print(self.RAM.available_ram)
         [print(p) for p in self.RAM.memory]
@@ -138,4 +146,4 @@ class MMU:
         print("SIMULATION TIME")
         print(self.simulation_time)
         print("THRASHING")
-        print(self.thrashing)
+        print(self.thrashing)"""

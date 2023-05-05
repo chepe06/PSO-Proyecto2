@@ -74,16 +74,12 @@ class OPT:
 
         for ptr_id in ptr_page_loaded:
             if ptr_id not in instructions_use:  # En caso de que no se use
-                pages_to_unload = [page for page in self.pages_loaded if page[0] == ptr_id]
-                order_to_unload = []
-                for page in pages_to_unload:  # Se bajan todas las páginas que no se vuelven a utilizar
-                    # print("page_to_unload", page)
-                    self.pages_loaded.remove(page)  # Se baja la página de RAM
-                    self.pages_in_disk.append(page)  # Se sube la página en Disco
-                    order_to_unload.append(page)  # Se hace una lista de las páginas a bajar en un solo paging
-                    self.increase_ram(self.page_size)  # Se aumenta la RAM en 1 tamaño de página
+                page_to_unload = [page for page in self.pages_loaded if page[0] == ptr_id][0]
+                self.pages_loaded.remove(page_to_unload)  # Se baja la página de RAM
+                self.pages_in_disk.append(page_to_unload)  # Se sube la página en Disco
+                self.include_to_queue(page_to_unload)  # Se agrega a la cola de orden de bajar de RAM por el OTP
+                self.increase_ram(self.page_size)  # Se aumenta la RAM en 1 tamaño de página
                 unload_complete = True
-                self.include_to_queue(order_to_unload)
                 break
             else:  # Si se vuelve a usar se guarda la posición del siguiente uso
                 index = instructions_use.index(ptr_id)
@@ -215,7 +211,8 @@ def open_document(filename):
 
     return instructions
 
-
+"""
 x = OPT(open_document("Test.txt"))
 print(x.process_commands())
 print(x.instructions)
+"""

@@ -1,7 +1,7 @@
 import math
 from MMU import MMU
-from RAM import RAM
-from Disk import Disk
+#from RAM import RAM
+#from Disk import Disk
 
 
 class MMU_OPT(MMU):
@@ -10,21 +10,12 @@ class MMU_OPT(MMU):
         self.order_to_unload = order_to_unload
 
     def unload_page(self):
-        page_to_unload = self.order_to_unload.pop(0)  # Página o Páginas por unload
-        if isinstance(page_to_unload, list):
-            for p in page_to_unload:
-                page_id = p[1]
-                real_page = self.RAM.unload_page(page_id)
-                real_page.set_flag(False)
-                self.add_page_to_memory_table(real_page.page_id,
-                                              real_page)  # Se actualiza de la tabla de memoria
-                self.disk.load_page(real_page)
-        else:
-            real_page = self.RAM.unload_page(page_to_unload[1])
-            real_page.set_flag(False)
-            self.add_page_to_memory_table(real_page.page_id,
-                                          real_page)  # Se actualiza de la tabla de memoria
-            self.disk.load_page(real_page)
+        page_to_unload = self.order_to_unload.pop(0)  # Página  por unload
+        real_page = self.RAM.unload_page(page_to_unload[1])
+        real_page.set_flag(False)
+        self.add_page_to_memory_table(real_page.page_id,
+                                      real_page)  # Se actualiza de la tabla de memoria
+        self.disk.load_page(real_page)
 
     def new(self, pid, size):
         page_size = self.RAM.page_size
@@ -120,7 +111,7 @@ class MMU_OPT(MMU):
 TOTAL_RAM = 1000
 AMOUNT_PAGES = 10
 PAGE_SIZE = 100
-
+"""
 RAM = RAM(TOTAL_RAM, AMOUNT_PAGES, PAGE_SIZE)
 DISK = Disk(PAGE_SIZE)
 ORDER_TO_UNLOAD = [[(1, 1), (1, 2), (1, 3), (1, 4)]]
@@ -131,3 +122,4 @@ INSTRUCTIONS = [['new', '1', '400'], ['new', '2', '400'], ['use', '1'], ['new', 
 
 for x in INSTRUCTIONS:
     MMU_OPT.simulate(x)
+"""

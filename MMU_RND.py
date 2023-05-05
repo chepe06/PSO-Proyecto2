@@ -1,8 +1,8 @@
 import math
 import random
 from MMU import MMU
-from RAM import RAM
-from Disk import Disk
+#from RAM import RAM
+#from Disk import Disk
 
 
 class MMU_RND(MMU):
@@ -116,7 +116,7 @@ class MMU_RND(MMU):
 TOTAL_RAM = 1000
 AMOUNT_PAGES = 10
 PAGE_SIZE = 100
-
+"""
 RAM = RAM(TOTAL_RAM, AMOUNT_PAGES, PAGE_SIZE)
 DISK = Disk(PAGE_SIZE)
 SEED = 1
@@ -126,3 +126,4 @@ MMU_RND = MMU_RND(RAM, DISK, SEED)
 INSTRUCTIONS = [['new', '1', '400'], ['new', '2', '400'], ['use', '1'], ['new', '1', '400']]
 for x in INSTRUCTIONS:
     MMU_RND.simulate(x)
+"""
