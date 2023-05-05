@@ -385,7 +385,8 @@ def openNewWindow():
     def startProgram():
 
         global selected, instructions, MMU_OPT, MMU_RND, fileSelected, filename
-
+        print(fileSelected)
+        print(filename)
         if fileSelected == True:
             instructions = open_document(filename)
         else:
@@ -405,8 +406,13 @@ def openNewWindow():
         MMU_OPT = MMU_OPT(RAM1, DISK1, order_to_unload)
 
         if selected.get() == "RND":
+            global paused
+
             MMU_RND = MMU_RND(RAM2, DISK2, seedEntry.get())
             for instruction in instructions:
+                while paused:
+                    print("detenido")
+                    time.sleep(1)
                 MMU_OPT.simulate(instruction)
                 # print(MMU_OPT.RAM.available_ram)
                 MMU_RND.simulate(instruction)
@@ -441,6 +447,20 @@ def openNewWindow():
                 # print(MMU_RND.RAM.available_ram)
                 updateWindowContent()
         """
+
+    def stoploop():
+        print("Llego aqui")
+        global paused
+        if paused:
+            paused = False
+        else:
+            paused = True
+        print(paused)
+
+    btnStop = Button(nwMainFrame, text="Pausar/Correr", command=stoploop)
+    btnStop.grid(row=7, column=0)
+    btnStop.config(cursor="hand2")
+
 
     startProgram()
 
