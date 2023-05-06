@@ -14,6 +14,9 @@ class MMU_FIFO(MMU):
         real_page = self.RAM.unload_page(page_to_unload.get_page_id())
         real_page.set_flag(False)
         real_page.set_loaded_time(-1)
+        size = real_page.get_size()
+        if size < self.RAM.page_size:
+            self.decrement_fragmentation(self.RAM.page_size - size)
         self.add_page_to_memory_table(real_page.page_id,
                                       real_page)  # Se actualiza de la tabla de memoria
         self.disk.load_page(real_page)
@@ -75,10 +78,7 @@ class MMU_FIFO(MMU):
                 self.queue.remove(page_unloaded)
             else:
                 page_to_unload = self.memory_table[p]
-                page_unloaded = self.disk.unload_page(page_to_unload)
-                size = page_unloaded.get_size()
-                if size < self.RAM.page_size:
-                    self.decrement_fragmentation(self.RAM.page_size - size)
+                self.disk.unload_page(page_to_unload)
             self.delete_from_memory_table(p)
 
         self.ptrs.pop(ptr_id)

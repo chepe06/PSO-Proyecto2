@@ -2,8 +2,8 @@ import math
 from MMU import MMU
 from Page_SC import Page_SC
 
-from RAM import RAM
-from Disk import Disk
+#from RAM import RAM
+#from Disk import Disk
 
 
 class MMU_SC(MMU):
@@ -44,8 +44,6 @@ class MMU_SC(MMU):
         return Page_SC(pid, self.ptr_id, self.page_id, -1, True, size, loaded_time)
 
     def unload_page(self, ptr_id):
-        #print("SECOND_CHANCE_LIST")
-        #[print(p) for p in self.second_chance_list]
         sc = True
         while sc:
             for page in self.second_chance_list:
@@ -54,11 +52,12 @@ class MMU_SC(MMU):
                     real_page = self.RAM.unload_page(page.get_page_id())
                     real_page.set_flag(False)
                     real_page.set_loaded_time(-1)
+                    size = real_page.get_size()
+                    if size < self.RAM.page_size:
+                        self.decrement_fragmentation(self.RAM.page_size - size)
                     self.add_page_to_memory_table(real_page.page_id,
                                                   real_page)  # Se actualiza de la tabla de memoria
                     self.disk.load_page(real_page)
-                    #print("PAGE UNLOADED")
-                    #print(page)
                     sc = False
                     break
                 else:
@@ -126,10 +125,7 @@ class MMU_SC(MMU):
                 self.second_chance_list.remove(page_unloaded)
             else:
                 page_to_unload = self.memory_table[p]
-                page_unloaded = self.disk.unload_page(page_to_unload)
-                size = page_unloaded.get_size()
-                if size < self.RAM.page_size:
-                    self.decrement_fragmentation(self.RAM.page_size - size)
+                self.disk.unload_page(page_to_unload)
             self.delete_from_memory_table(p)
 
         self.ptrs.pop(ptr_id)
@@ -141,7 +137,7 @@ class MMU_SC(MMU):
                 self.delete(ptr_id)
         self.pids.pop(pid)
 
-
+"""
 # COMPUTER
 TOTAL_RAM = 1000
 AMOUNT_PAGES = 10
@@ -156,3 +152,4 @@ for x in INSTRUCTIONS:
     # print("RECENTLY USED")
     # [print(p) for p in MMU_MRU.recently_used]
     MMU_SC.simulate(x)
+"""
