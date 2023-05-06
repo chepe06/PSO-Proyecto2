@@ -9,8 +9,6 @@ from tkinter import filedialog
 # ttk import
 from tkinter import ttk
 
-tv = ""
-
 from RAM import RAM
 from Disk import Disk
 from MMU_OPT import MMU_OPT
@@ -23,12 +21,21 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 paused = False
 filename = ""
 fileSelected = False
+canvas = ""
+canvas1 = ""
 
 # COMPUTER
 TOTAL_RAM = 400000
 AMOUNT_PAGES = 100
 PAGE_SIZE = 4000
 
+#Genera una lista de colores hexadecimales random
+def generate_colors():
+    colores = []
+    for _ in range(int(pselected.get())+1):
+        color = '#{:06x}'.format(random.randint(0, 0xFFFFFF))
+        colores.append(color)
+    return colores
 
 def open_document(filename):
     instructions = []
@@ -63,14 +70,14 @@ def browseFiles():
     # Cambio de la etiqueta Archivo
     label_file_explorer.configure(text="File Opened: " + filename)
 
-
+#Funcion para ver que entradas recibe la interfaz
 def printSelectedOp():
     global filename
     print(selected.get())
     print(seedEntry.get())
     print(filename)
 
-
+#Funcion que genera comando random cuando no se ingresa ningun archivo
 def fileGenerator(seed, p, n):
     random.seed(seed)
     procesList = {}
@@ -78,7 +85,7 @@ def fileGenerator(seed, p, n):
     killProcess = []
     ptrCount = 1
     comandList = ["new", "use", "delete", "kill"]
-    weights = [0.54, 0.44, 0.01, 0.01]
+    weights = [0.54, 0.44, 0.01, 0.01]  #Pesos para la seleccion random de la lista anterior
 
     i = 1
     while i <= n and len(killProcess) != p:
@@ -129,6 +136,7 @@ def fileGenerator(seed, p, n):
 
 # Creacion de la nueva ventana
 def openNewWindow():
+    global canvas,canvas1
     newWindow = Toplevel(root)
     newWindow.title("Ejecuntando")
 
@@ -188,7 +196,7 @@ def openNewWindow():
     tv.heading("col4", text="M-ADDR", anchor=CENTER)
     tv.heading("col5", text="D-ADDR", anchor=CENTER)
     tv.heading("col6", text="LOADED-T", anchor=CENTER)
-    tv.heading("col7", text="MARK", anchor=CENTER)
+    tv.heading("col7", text="-----", anchor=CENTER)
     tv.grid(row=3, column=0, pady=5)
 
     h.configure(command=tv.yview)
@@ -281,7 +289,7 @@ def openNewWindow():
     tv1.heading("col4", text="M-ADDR", anchor=CENTER)
     tv1.heading("col5", text="D-ADDR", anchor=CENTER)
     tv1.heading("col6", text="LOADED-T", anchor=CENTER)
-    tv1.heading("col7", text="MARK", anchor=CENTER)
+    tv1.heading("col7", text="-----", anchor=CENTER)
     tv1.grid(row=3, column=2, pady=5)
 
     h2.configure(command=tv1.yview)
@@ -325,19 +333,88 @@ def openNewWindow():
 
     tv1i3.grid(row=6, column=2, pady=5)
 
+    #Genera una lista con los colores para los procesos, esta lista es de tamaño n segun la cantidad de procesos y posteriormente los convierte eb tags
+    colors = generate_colors()
+    for c in colors:
+        tv.tag_configure(str(c), background=str(c))
+        tv1.tag_configure(str(c), background=str(c))
+
     # _____________________________________________________________________
     # definicion de la funcion para actualizar el contenido de las tablas
     def updateWindowContent():
-        indx = 0
-        indxAux = 0
+        global canvas,canvas1
+        #Actualizar la RAM OPT
+
+        ramOPT = []
+        for i in MMU_OPT.RAM.get_pids_loaded():
+            if i == 0:
+                ramOPT.append('#FFFFFF')
+            else:
+                ramOPT.append(colors[i])
+
+
+        # Create a Figure object
+        figOPT = Figure(figsize=(6, 1), dpi=100)
+
+        # Create a table
+        tableOPT = figOPT.add_subplot(111)
+        tableOPT.axis('off')  # Hide the axes
+        tableOPT.axis('tight')
+        tableOPT.table(cellColours=[ramOPT], loc='center')
+        canvas.get_tk_widget().destroy()
+        # Create a Tkinter canvas that can display the figure
+        canvas = FigureCanvasTkAgg(figOPT, master=nwMainFrame)
+        canvas.draw()
+
+        # Pack the canvas into the tkinter window
+        canvas.get_tk_widget().grid(row=1, column=0, columnspan=1)
+
+        #_______________________________________________________________
+        #Actualizar RAM algoritmo
+
+        ramAlg = []
+        for i in MMU_RND.RAM.get_pids_loaded():
+            if i == 0:
+                ramAlg.append('#FFFFFF')
+            else:
+                ramAlg.append(colors[i])
+
+        # Create a Figure object
+        figAlg = Figure(figsize=(6, 1), dpi=100)
+
+        # Create a table
+        tableAlg = figAlg.add_subplot(111)
+        tableAlg.axis('off')  # Hide the axes
+        tableAlg.axis('tight')
+        tableAlg.table(cellColours=[ramAlg], loc='center')
+        canvas1.get_tk_widget().destroy()
+        # Create a Tkinter canvas that can display the figure
+        canvas1 = FigureCanvasTkAgg(figAlg, master=nwMainFrame)
+        canvas1.draw()
+
+        # Pack the canvas into the tkinter window
+        canvas1.get_tk_widget().grid(row=1, column=2, columnspan=1)
+
         # --------------------------------------------------------------
         # Actualizar las tabalas del OTP
+        indx = 0
+        indxAux = 0
+
         tv.delete(*tv.get_children())
 
         for pg in MMU_OPT.get_memory_table().values():
-            tv.insert(parent="", index=str(indx), text=str(indx), values=(
-            str(pg.get_page_id()), str(pg.get_pid()), str(pg.get_flag()), str(pg.get_page_id()), str(pg.get_ptr_id()),
-            str(pg.get_direction()), str(pg.get_loaded_time()) + "s", ""))
+            aux = ""
+            aux2 = "0"
+
+            if pg.get_flag():
+                aux = "x"
+
+            if pg.get_loaded_time()!=-1:
+                aux2 = str(pg.get_loaded_time())
+
+            tv.insert(parent="", index=str(indx),tags=colors[pg.get_pid()], text=str(indx), values=(
+            str(pg.get_page_id()), str(pg.get_pid()), aux, str(pg.get_page_id()), str(pg.get_ptr_id()),
+            str(pg.get_direction()), aux2 + "s", "-----"))
             indx += 1
     
 
@@ -357,9 +434,18 @@ def openNewWindow():
         tv1.delete(*tv1.get_children())
 
         for pg2 in MMU_RND.get_memory_table().values():
-            tv1.insert(parent="", index=str(indxAux), text=str(indxAux), values=(
-            str(pg2.get_page_id()), str(pg2.get_pid()), str(pg2.get_flag()), str(pg2.get_page_id()),
-            str(pg2.get_ptr_id()), str(pg2.get_direction()), str(pg.get_loaded_time()) + "s", ""))
+            aux = ""
+            aux2 = "0"
+
+            if pg2.get_flag():
+                aux = "x"
+
+            if pg2.get_loaded_time()!=-1:
+                aux2 = str(pg2.get_loaded_time())
+
+            tv1.insert(parent="", index=str(indxAux),tags=colors[pg2.get_pid()], text=str(indxAux), values=(
+            str(pg2.get_page_id()), str(pg2.get_pid()), aux, str(pg2.get_page_id()),
+            str(pg2.get_ptr_id()), str(pg2.get_direction()), aux2 + "s", "-----"))
             indxAux += 1
            
 
@@ -376,7 +462,6 @@ def openNewWindow():
 
     # print(MMU_OPT.RAM.get_pids_loaded())
     # print(MMU_OPT.get_memory_table()[1])
-
     # ___________________________________________________________________________
     # Funcion que inicia el programa
     def startProgram():
