@@ -13,6 +13,9 @@ from RAM import RAM
 from Disk import Disk
 from MMU_OPT import MMU_OPT
 from MMU_RND import MMU_RND
+from MMU_FIFO import MMU_FIFO
+from MMU_SC import MMU_SC
+from MMU_MRU import MMU_MRU
 
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
@@ -341,7 +344,7 @@ def openNewWindow():
 
     # _____________________________________________________________________
     # definicion de la funcion para actualizar el contenido de las tablas
-    def updateWindowContent():
+    def updateWindowContent(algr):
         global canvas,canvas1
         #Actualizar la RAM OPT
 
@@ -373,7 +376,7 @@ def openNewWindow():
         #Actualizar RAM algoritmo
 
         ramAlg = []
-        for i in MMU_RND.RAM.get_pids_loaded():
+        for i in algr.RAM.get_pids_loaded():
             if i == 0:
                 ramAlg.append('#FFFFFF')
             else:
@@ -433,7 +436,7 @@ def openNewWindow():
         # Actualizar las tabalas del Algoritmo comparado
         tv1.delete(*tv1.get_children())
 
-        for pg2 in MMU_RND.get_memory_table().values():
+        for pg2 in algr.get_memory_table().values():
             aux = ""
             aux2 = "0"
 
@@ -450,15 +453,15 @@ def openNewWindow():
            
 
         tv1i1.delete(*tv1i1.get_children())
-        tv1i1.insert(parent="", index=0, text=str(MMU_RND.get_process()), values=(str(MMU_RND.get_simulation_time())))
+        tv1i1.insert(parent="", index=0, text=str(algr.get_process()), values=(str(algr.get_simulation_time())))
 
         tv1i2.delete(*tv1i2.get_children())
-        tv1i2.insert(parent="", index=0, text=str(MMU_RND.get_used_ram()), values=(
-        str(MMU_RND.get_percent_ram_used()), str(MMU_RND.get_used_disk()), str(MMU_RND.get_percent_disk_used())))
+        tv1i2.insert(parent="", index=0, text=str(algr.get_used_ram()), values=(
+        str(algr.get_percent_ram_used()), str(algr.get_used_disk()), str(algr.get_percent_disk_used())))
 
         tv1i3.delete(*tv1i3.get_children())
-        tv1i3.insert(parent="", index=0, text=str(MMU_RND.get_pages_loaded()), values=(
-        str(MMU_RND.get_pages_unloaded()), str(MMU_RND.get_thrashing()), str(MMU_RND.get_percent_thrashing()), str(MMU_RND.get_fragmentation())))
+        tv1i3.insert(parent="", index=0, text=str(algr.get_pages_loaded()), values=(
+        str(algr.get_pages_unloaded()), str(algr.get_thrashing()), str(algr.get_percent_thrashing()), str(algr.get_fragmentation())))
 
     # print(MMU_OPT.RAM.get_pids_loaded())
     # print(MMU_OPT.get_memory_table()[1])
@@ -466,7 +469,7 @@ def openNewWindow():
     # Funcion que inicia el programa
     def startProgram():
 
-        global selected, instructions, MMU_OPT, MMU_RND, fileSelected, filename
+        global selected, instructions, MMU_OPT, MMU_RND, MMU_MRU, MMU_FIFO, MMU_SC, fileSelected, filename
         print(fileSelected)
         print(filename)
         if fileSelected == True:
@@ -487,48 +490,66 @@ def openNewWindow():
         DISK2 = Disk(PAGE_SIZE)
         MMU_OPT = MMU_OPT(RAM1, DISK1, order_to_unload)
 
+        global paused
+
         if selected.get() == "RND":
-            global paused
 
             MMU_RND = MMU_RND(RAM2, DISK2, seedEntry.get())
             for instruction in instructions:
                 while paused:
                     print("detenido")
                     time.sleep(1)
-                MMU_OPT.simulate(instruction)
-                # print(MMU_OPT.RAM.available_ram)
-                MMU_RND.simulate(instruction)
-                # print(MMU_RND.RAM.available_ram)
-                updateWindowContent()
-                time.sleep(1)
 
-        """if selected.get() == "FIFO":
+                MMU_OPT.simulate(instruction)
+
+                MMU_RND.simulate(instruction)
+
+                updateWindowContent(MMU_RND)
+                time.sleep(1)
+        if selected.get() == "FIFO":
+
+            MMU_FIFO = MMU_FIFO(RAM2, DISK2)
 
             for instruction in instructions:
+                while paused:
+                    print("detenido")
+                    time.sleep(1)
+
                 MMU_OPT.simulate(instruction)
-                # print(MMU_OPT.RAM.available_ram)
-                MMU_RND.simulate(instruction)
-                # print(MMU_RND.RAM.available_ram)
-                updateWindowContent()
+
+                MMU_FIFO.simulate(instruction)
+
+                updateWindowContent(MMU_FIFO)
 
         if selected.get() == "MRU":
 
+            MMU_MRU = MMU_MRU(RAM2, DISK2)
+
             for instruction in instructions:
+                while paused:
+                    print("detenido")
+                    time.sleep(1)
+
                 MMU_OPT.simulate(instruction)
-                # print(MMU_OPT.RAM.available_ram)
-                MMU_RND.simulate(instruction)
-                # print(MMU_RND.RAM.available_ram)
-                updateWindowContent()
+
+                MMU_MRU.simulate(instruction)
+
+                updateWindowContent(MMU_MRU)
 
         if selected.get() == "SC":
 
+            MMU_SC = MMU_SC(RAM2, DISK2)
+
             for instruction in instructions:
+                while paused:
+                    print("detenido")
+                    time.sleep(1)
+
                 MMU_OPT.simulate(instruction)
-                # print(MMU_OPT.RAM.available_ram)
-                MMU_RND.simulate(instruction)
-                # print(MMU_RND.RAM.available_ram)
-                updateWindowContent()
-        """
+
+                MMU_SC.simulate(instruction)
+
+                updateWindowContent(MMU_SC)
 
     def stoploop():
         print("Llego aqui")
