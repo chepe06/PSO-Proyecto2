@@ -212,7 +212,9 @@ def open_document(filename):
     return instructions
 
 """
-x = OPT(open_document("Test.txt"))
+instructions = open_document("generatedFile.txt")
+print(instructions)
+
+x = OPT()
 print(x.process_commands())
-print(x.instructions)
-"""
+print(x.instructions)"""

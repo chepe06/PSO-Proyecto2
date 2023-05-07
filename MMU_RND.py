@@ -56,6 +56,8 @@ class MMU_RND(MMU):
                 page_to_load = self.disk.unload_page(self.memory_table[page_id])
                 page_to_load.set_flag(True)
                 page_to_load.set_loaded_time(self.simulation_time)
+                if page_to_load.get_size() < self.RAM.page_size:
+                    self.increment_fragmentation(self.RAM.page_size - page_to_load.get_size())
                 page_load = self.RAM.load_page(self.memory_table[page_id])
                 self.add_page_to_memory_table(page_load.page_id,
                                               page_load)  # SE ACTUALIZA DE LA TABLA DE MEMORIA

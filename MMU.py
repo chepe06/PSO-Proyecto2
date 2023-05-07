@@ -170,8 +170,8 @@ class MMU:
         print("DISK\n")
         print(self.disk.used_memory)
         [print(p) for p in self.disk.memory]
-        print("MEM TABLE\n")
-        [print(p, " - ", self.memory_table[p]) for p in self.memory_table]
+        #print("MEM TABLE\n")
+        #[print(p, " - ", self.memory_table[p]) for p in self.memory_table]
 
         print("FRAGMENTATION")
         print(self.fragmentation)
