@@ -15,7 +15,7 @@ José Arce Morales
 
 ## Descripción
 
-Este proyecto conciste en un simulador de algoritmos de paginacion y su respectiva comparacion gráfica en contraste con el algoritmo óptimo.
+Este proyecto conciste en un simulador de algoritmos de paginación y su respectiva comparacion gráfica en contraste con el algoritmo óptimo.
 Los algoritmos que se pueden escoger son: Second Chance, FIFO, MRU y Random.
 
 ## Indicaciones
