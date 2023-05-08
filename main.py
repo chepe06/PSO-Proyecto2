@@ -35,9 +35,15 @@ PAGE_SIZE = 4000
 #Genera una lista de colores hexadecimales random
 def generate_colors():
     colores = []
-    for _ in range(int(pselected.get())+1):
-        color = '#{:06x}'.format(random.randint(0, 0xFFFFFF))
-        colores.append(color)
+    if fileSelected:
+        for _ in range(1000):
+            color = '#{:06x}'.format(random.randint(0, 0xFFFFFF))
+            colores.append(color)
+    else:
+        for _ in range(int(pselected.get())+1):
+            color = '#{:06x}'.format(random.randint(0, 0xFFFFFF))
+            colores.append(color)
+
     return colores
 
 def open_document(filename):
@@ -408,16 +414,22 @@ def openNewWindow():
         for pg in MMU_OPT.get_memory_table().values():
             aux = ""
             aux2 = "0"
+            ram_address = ""
+            disk_address = ""
 
             if pg.get_flag():
                 aux = "x"
+                ram_address = pg.get_direction()
+            else:
+                disk_address = pg.get_direction()
+
 
             if pg.get_loaded_time()!=-1:
                 aux2 = str(pg.get_loaded_time())
 
             tv.insert(parent="", index=str(indx),tags=colors[pg.get_pid()], text=str(indx), values=(
-            str(pg.get_page_id()), str(pg.get_pid()), aux, str(pg.get_page_id()), str(pg.get_ptr_id()),
-            str(pg.get_direction()), aux2 + "s", "-----"))
+            str(pg.get_page_id()), str(pg.get_pid()), aux, str(pg.get_ptr_id()), str(ram_address),
+            str(disk_address), aux2 + "s", "-----"))
             indx += 1
     
 
@@ -439,16 +451,21 @@ def openNewWindow():
         for pg2 in algr.get_memory_table().values():
             aux = ""
             aux2 = "0"
+            ram_address = ""
+            disk_address = ""
 
             if pg2.get_flag():
                 aux = "x"
+                ram_address = pg2.get_direction()
+            else:
+                disk_address = pg2.get_direction()
 
             if pg2.get_loaded_time()!=-1:
                 aux2 = str(pg2.get_loaded_time())
 
             tv1.insert(parent="", index=str(indxAux),tags=colors[pg2.get_pid()], text=str(indxAux), values=(
-            str(pg2.get_page_id()), str(pg2.get_pid()), aux, str(pg2.get_page_id()),
-            str(pg2.get_ptr_id()), str(pg2.get_direction()), aux2 + "s", "-----"))
+            str(pg2.get_page_id()), str(pg2.get_pid()), aux, str(pg2.get_ptr_id()),
+            str(ram_address), str(disk_address), aux2 + "s", "-----"))
             indxAux += 1
            
 
@@ -505,7 +522,7 @@ def openNewWindow():
                 MMU_RND.simulate(instruction)
 
                 updateWindowContent(MMU_RND)
-                time.sleep(1)
+                time.sleep(0.005)
         if selected.get() == "FIFO":
 
             MMU_FIFO = MMU_FIFO(RAM2, DISK2)
