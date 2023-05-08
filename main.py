@@ -413,7 +413,7 @@ def openNewWindow():
 
         for pg in MMU_OPT.get_memory_table().values():
             aux = ""
-            aux2 = "0"
+            aux2 = ""
             ram_address = ""
             disk_address = ""
 
@@ -425,11 +425,11 @@ def openNewWindow():
 
 
             if pg.get_loaded_time()!=-1:
-                aux2 = str(pg.get_loaded_time())
+                aux2 = str(pg.get_loaded_time()) + "s"
 
             tv.insert(parent="", index=str(indx),tags=colors[pg.get_pid()], text=str(indx), values=(
             str(pg.get_page_id()), str(pg.get_pid()), aux, str(pg.get_ptr_id()), str(ram_address),
-            str(disk_address), aux2 + "s", "-----"))
+            str(disk_address), aux2 , "-----"))
             indx += 1
     
 
@@ -450,7 +450,7 @@ def openNewWindow():
 
         for pg2 in algr.get_memory_table().values():
             aux = ""
-            aux2 = "0"
+            aux2 = ""
             ram_address = ""
             disk_address = ""
 
@@ -461,11 +461,12 @@ def openNewWindow():
                 disk_address = pg2.get_direction()
 
             if pg2.get_loaded_time()!=-1:
-                aux2 = str(pg2.get_loaded_time())
+                aux2 = str(pg2.get_loaded_time()) + "s"
+
 
             tv1.insert(parent="", index=str(indxAux),tags=colors[pg2.get_pid()], text=str(indxAux), values=(
             str(pg2.get_page_id()), str(pg2.get_pid()), aux, str(pg2.get_ptr_id()),
-            str(ram_address), str(disk_address), aux2 + "s", "-----"))
+            str(ram_address), str(disk_address), aux2, "-----"))
             indxAux += 1
            
 
